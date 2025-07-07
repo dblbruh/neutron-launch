@@ -8,12 +8,12 @@ export default function Header() {
         <nav className="flex items-center justify-between">
           <div className="flex items-center space-x-2">
             <img
-              src="/img/a6ee8f4d-26f5-4ec3-ada3-dfa630021d75.jpg"
-              alt="CS2 Tournament"
-              className="h-8 w-8 rounded"
+              src="https://cdn.poehali.dev/files/ffbab4cd-41e6-4c90-9cce-a53d16843226.png"
+              alt="CHAMPLINK"
+              className="h-8 w-8"
             />
             <h1 className="text-xl font-bold bg-gradient-to-r from-yellow-400 to-yellow-600 bg-clip-text text-transparent">
-              CS2 ARENA
+              CHAMPLINK
             </h1>
           </div>
           <div className="hidden md:flex items-center space-x-6">
