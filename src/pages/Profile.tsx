@@ -129,20 +129,36 @@ export default function Profile() {
               <CardContent>
                 <div className="grid grid-cols-2 gap-4">
                   <div className="text-center">
-                    <p className="text-3xl font-bold text-white">156</p>
+                    <p className="text-2xl font-bold text-white">156</p>
                     <p className="text-zinc-400 text-sm">Побед</p>
                   </div>
                   <div className="text-center">
-                    <p className="text-3xl font-bold text-white">89</p>
+                    <p className="text-2xl font-bold text-white">89</p>
                     <p className="text-zinc-400 text-sm">Поражений</p>
                   </div>
                   <div className="text-center">
-                    <p className="text-3xl font-bold text-white">1.76</p>
+                    <p className="text-2xl font-bold text-white">1.76</p>
                     <p className="text-zinc-400 text-sm">K/D</p>
                   </div>
                   <div className="text-center">
-                    <p className="text-3xl font-bold text-white">63.7%</p>
+                    <p className="text-2xl font-bold text-white">63.7%</p>
                     <p className="text-zinc-400 text-sm">Винрейт</p>
+                  </div>
+                  <div className="text-center">
+                    <p className="text-2xl font-bold text-white">83.4</p>
+                    <p className="text-zinc-400 text-sm">ADR</p>
+                  </div>
+                  <div className="text-center">
+                    <p className="text-2xl font-bold text-white">0.71</p>
+                    <p className="text-zinc-400 text-sm">KPR</p>
+                  </div>
+                  <div className="text-center">
+                    <p className="text-2xl font-bold text-white">0.40</p>
+                    <p className="text-zinc-400 text-sm">DPR</p>
+                  </div>
+                  <div className="text-center">
+                    <p className="text-2xl font-bold text-white">42.3%</p>
+                    <p className="text-zinc-400 text-sm">HS%</p>
                   </div>
                 </div>
               </CardContent>
@@ -177,6 +193,47 @@ export default function Profile() {
               </CardContent>
             </Card>
           </div>
+
+          <Card className="bg-zinc-900/50 border-zinc-800 mb-8">
+            <CardHeader>
+              <CardTitle className="text-2xl font-bold text-white">
+                <Icon name="TrendingUp" size={24} className="mr-2 inline" />
+                График рейтинга
+              </CardTitle>
+              <CardDescription className="text-zinc-400">
+                Изменение рейтинга за последний месяц
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="h-64 flex items-end justify-between space-x-2">
+                {[
+                  2750, 2780, 2720, 2850, 2800, 2840, 2790, 2820, 2870, 2847,
+                ].map((rating, index) => {
+                  const height = ((rating - 2700) / 200) * 100;
+                  return (
+                    <div
+                      key={index}
+                      className="flex flex-col items-center flex-1"
+                    >
+                      <div className="text-xs text-zinc-400 mb-1">{rating}</div>
+                      <div
+                        className="w-full bg-gradient-to-t from-yellow-400 to-yellow-600 rounded-t transition-all duration-300 hover:from-yellow-300 hover:to-yellow-500"
+                        style={{ height: `${height}%`, minHeight: "10px" }}
+                      ></div>
+                      <div className="text-xs text-zinc-500 mt-1">
+                        {index + 1}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+              <div className="mt-4 flex justify-between items-center">
+                <div className="text-sm text-zinc-400">Пик: 2,870</div>
+                <div className="text-sm text-zinc-400">Текущий: 2,847</div>
+                <div className="text-sm text-green-400">+97 за месяц</div>
+              </div>
+            </CardContent>
+          </Card>
 
           <Card className="bg-zinc-900/50 border-zinc-800">
             <CardHeader>
