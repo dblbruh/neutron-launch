@@ -83,7 +83,7 @@ export default function Footer() {
 
         <div className="border-t border-zinc-800 mt-8 pt-8 flex flex-col md:flex-row justify-between items-center">
           <p className="text-zinc-400 text-sm">
-            © 2024 CS2 ARENA. Все права защищены.
+            © 2024 CHAMPLINK. Все права защищены.
           </p>
           <div className="flex items-center space-x-4 mt-4 md:mt-0">
             {socialLinks.map((social, index) => (
