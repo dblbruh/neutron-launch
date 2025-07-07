@@ -54,7 +54,7 @@ export default function Footer() {
                 className="h-8 w-8 rounded"
               />
               <h4 className="text-xl font-bold bg-gradient-to-r from-yellow-400 to-yellow-600 bg-clip-text text-transparent">
-                CS2 ARENA
+                CHAMPLINK
               </h4>
             </div>
             <p className="text-zinc-400">
