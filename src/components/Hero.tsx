@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button";
 import Icon from "@/components/ui/icon";
+import PlayerStats from "@/components/PlayerStats";
 
 export default function Hero() {
   return (
@@ -22,7 +23,7 @@ export default function Hero() {
             Участвуйте в крупнейших турнирах России. Отборочные туры, честный
             подбор игроков, региональные рейтинги и призы от собранных подписок.
           </p>
-          <div className="flex flex-col sm:flex-row gap-4">
+          <div className="flex flex-col sm:flex-row gap-4 mb-12">
             <Button
               size="lg"
               className="bg-gradient-to-r from-yellow-400 to-yellow-600 text-black hover:from-yellow-500 hover:to-yellow-700 text-lg px-8"
@@ -39,6 +40,7 @@ export default function Hero() {
               Турниры
             </Button>
           </div>
+          <PlayerStats />
         </div>
       </div>
     </section>
