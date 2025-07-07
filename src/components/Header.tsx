@@ -10,7 +10,7 @@ export default function Header() {
             <img
               src="https://cdn.poehali.dev/files/ffbab4cd-41e6-4c90-9cce-a53d16843226.png"
               alt="CHAMPLINK"
-              className="h-8 w-8"
+              className="h-8 w-8 py-0 my-0 mx-0 px-[1px] object-contain"
             />
             <h1 className="text-xl font-bold bg-gradient-to-r from-yellow-400 to-yellow-600 bg-clip-text text-transparent">
               CHAMPLINK
