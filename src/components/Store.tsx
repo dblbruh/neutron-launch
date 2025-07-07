@@ -27,19 +27,24 @@ const storeItems: StoreItem[] = [
     features: ["Золотой значок", "Эксклюзивные аватары", "Приоритет в матчах"],
   },
   {
-    id: "rating-boost",
-    title: "Boost рейтинга",
-    description: "Ускорьте прокачку рейтинга",
-    price: 199,
-    icon: "Star",
-    features: ["+50% к рейтингу", "Действует 7 дней", "Стакается с другими"],
+    id: "team-registration",
+    title: "Регистрация команды",
+    description: "Зарегистрируйте название и логотип команды",
+    price: 899,
+    icon: "Users",
+    features: [
+      "Уникальное название",
+      "Загрузка логотипа",
+      "Рассмотрение заявки",
+      "Официальный статус",
+    ],
   },
   {
     id: "team-package",
     title: "Команда месяца",
     description: "Создайте команду с друзьями",
     price: 499,
-    icon: "Users",
+    icon: "Crown",
     features: ["Командный рейтинг", "Закрытый чат", "Статистика команды"],
   },
 ];
@@ -86,7 +91,7 @@ export default function Store() {
         <div className="text-center mb-12">
           <h3 className="text-3xl font-bold mb-4">Магазин</h3>
           <p className="text-zinc-400 max-w-2xl mx-auto">
-            Приобретайте игровые предметы и улучшения для своего профиля
+            Зарегистрируйте команду и получите официальный статус в турнирах
           </p>
         </div>
 
