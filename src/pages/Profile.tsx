@@ -83,70 +83,92 @@ export default function Profile() {
       <main className="container mx-auto px-4 py-16">
         <div className="max-w-6xl mx-auto">
           <div className="grid lg:grid-cols-3 gap-8 mb-8">
-            <Card className="bg-zinc-900/50 border-zinc-800">
-              <CardHeader className="text-center">
-                <div className="w-24 h-24 bg-gradient-to-br from-yellow-400/20 to-yellow-600/20 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <Icon name="User" size={48} className="text-yellow-400" />
-                </div>
-                <CardTitle className="text-2xl font-bold text-white">
-                  ProGamer_2024
-                </CardTitle>
-                <CardDescription className="text-zinc-400">
-                  Золотой элит мастер
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  <div className="flex justify-between items-center">
-                    <span className="text-zinc-400">Рейтинг:</span>
-                    <span className="text-2xl font-bold text-yellow-400">
-                      2,847
-                    </span>
+            <Card className="bg-gradient-to-br from-yellow-400/10 via-yellow-600/5 to-yellow-800/10 border-yellow-500/30 overflow-hidden">
+              <div className="relative h-full">
+                <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-yellow-400/20 to-transparent rounded-bl-full"></div>
+                <div className="absolute bottom-0 left-0 w-20 h-20 bg-gradient-to-tr from-yellow-600/20 to-transparent rounded-tr-full"></div>
+
+                <CardContent className="p-6 relative z-10">
+                  <div className="flex items-start justify-between mb-6">
+                    <div className="flex items-center space-x-4">
+                      <div className="w-16 h-16 bg-gradient-to-br from-yellow-400 to-yellow-600 rounded-lg flex items-center justify-center shadow-lg">
+                        <Icon name="User" size={32} className="text-black" />
+                      </div>
+                      <div>
+                        <h3 className="text-xl font-bold text-white">
+                          ProGamer_2024
+                        </h3>
+                        <p className="text-yellow-400 text-sm font-medium">
+                          Золотой элит мастер
+                        </p>
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <div className="text-3xl font-bold text-yellow-400">
+                        2847
+                      </div>
+                      <div className="text-xs text-zinc-400 uppercase tracking-wide">
+                        Рейтинг
+                      </div>
+                    </div>
                   </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-zinc-400">Регион:</span>
-                    <span className="text-white">Москва</span>
+
+                  <div className="grid grid-cols-3 gap-4 mb-6">
+                    <div className="text-center">
+                      <div className="text-2xl font-bold text-white">1.76</div>
+                      <div className="text-xs text-zinc-400 uppercase">K/D</div>
+                    </div>
+                    <div className="text-center">
+                      <div className="text-2xl font-bold text-white">83.4</div>
+                      <div className="text-xs text-zinc-400 uppercase">ADR</div>
+                    </div>
+                    <div className="text-center">
+                      <div className="text-2xl font-bold text-white">42.3%</div>
+                      <div className="text-xs text-zinc-400 uppercase">HS%</div>
+                    </div>
                   </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-zinc-400">Команда:</span>
-                    <span className="text-white">FireStorm</span>
+
+                  <div className="grid grid-cols-2 gap-4 mb-6">
+                    <div className="bg-black/20 rounded-lg p-3">
+                      <div className="flex items-center justify-between">
+                        <span className="text-zinc-400 text-sm">Победы</span>
+                        <span className="text-white font-bold">156</span>
+                      </div>
+                    </div>
+                    <div className="bg-black/20 rounded-lg p-3">
+                      <div className="flex items-center justify-between">
+                        <span className="text-zinc-400 text-sm">Винрейт</span>
+                        <span className="text-white font-bold">63.7%</span>
+                      </div>
+                    </div>
                   </div>
-                </div>
-                <Button className="w-full mt-6 bg-gradient-to-r from-yellow-400 to-yellow-600 text-black hover:from-yellow-500 hover:to-yellow-700">
-                  <Icon name="Edit" size={20} className="mr-2" />
-                  Редактировать
-                </Button>
-              </CardContent>
+
+                  <div className="grid grid-cols-2 gap-4 text-sm">
+                    <div className="flex items-center justify-between">
+                      <span className="text-zinc-400">Регион</span>
+                      <span className="text-white">Москва</span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-zinc-400">Команда</span>
+                      <span className="text-white">FireStorm</span>
+                    </div>
+                  </div>
+                </CardContent>
+              </div>
             </Card>
 
             <Card className="bg-zinc-900/50 border-zinc-800">
               <CardHeader>
                 <CardTitle className="text-xl font-bold text-white">
                   <Icon name="Target" size={24} className="mr-2 inline" />
-                  Статистика
+                  Дополнительная статистика
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="grid grid-cols-2 gap-4">
                   <div className="text-center">
-                    <p className="text-2xl font-bold text-white">156</p>
-                    <p className="text-zinc-400 text-sm">Побед</p>
-                  </div>
-                  <div className="text-center">
                     <p className="text-2xl font-bold text-white">89</p>
                     <p className="text-zinc-400 text-sm">Поражений</p>
-                  </div>
-                  <div className="text-center">
-                    <p className="text-2xl font-bold text-white">1.76</p>
-                    <p className="text-zinc-400 text-sm">K/D</p>
-                  </div>
-                  <div className="text-center">
-                    <p className="text-2xl font-bold text-white">63.7%</p>
-                    <p className="text-zinc-400 text-sm">Винрейт</p>
-                  </div>
-                  <div className="text-center">
-                    <p className="text-2xl font-bold text-white">83.4</p>
-                    <p className="text-zinc-400 text-sm">ADR</p>
                   </div>
                   <div className="text-center">
                     <p className="text-2xl font-bold text-white">0.71</p>
@@ -157,8 +179,24 @@ export default function Profile() {
                     <p className="text-zinc-400 text-sm">DPR</p>
                   </div>
                   <div className="text-center">
-                    <p className="text-2xl font-bold text-white">42.3%</p>
-                    <p className="text-zinc-400 text-sm">HS%</p>
+                    <p className="text-2xl font-bold text-white">245</p>
+                    <p className="text-zinc-400 text-sm">Общие игры</p>
+                  </div>
+                  <div className="text-center">
+                    <p className="text-2xl font-bold text-white">3,842</p>
+                    <p className="text-zinc-400 text-sm">Общие убийства</p>
+                  </div>
+                  <div className="text-center">
+                    <p className="text-2xl font-bold text-white">187</p>
+                    <p className="text-zinc-400 text-sm">МВП</p>
+                  </div>
+                  <div className="text-center">
+                    <p className="text-2xl font-bold text-white">84.2</p>
+                    <p className="text-zinc-400 text-sm">Средний урон</p>
+                  </div>
+                  <div className="text-center">
+                    <p className="text-2xl font-bold text-white">12</p>
+                    <p className="text-zinc-400 text-sm">Клатчи</p>
                   </div>
                 </div>
               </CardContent>
