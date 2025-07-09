@@ -1,5 +1,6 @@
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import MatchmakingModal from "@/components/MatchmakingModal";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -9,6 +10,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import Icon from "@/components/ui/icon";
+import { useState } from "react";
 
 interface GameMode {
   id: string;
@@ -137,6 +139,14 @@ const getCurrentRank = (rating: number): RankTier => {
 };
 
 export default function Play() {
+  const [isMatchmakingOpen, setIsMatchmakingOpen] = useState(false);
+  const [selectedGameMode, setSelectedGameMode] = useState("");
+
+  const handleFindGame = (mode: GameMode) => {
+    setSelectedGameMode(mode.name);
+    setIsMatchmakingOpen(true);
+  };
+
   return (
     <div className="min-h-screen bg-black text-white">
       <Header />
@@ -184,6 +194,7 @@ export default function Play() {
                 </div>
 
                 <Button
+                  onClick={() => handleFindGame(mode)}
                   className="w-full bg-gradient-to-r from-yellow-400 to-yellow-600 text-black hover:from-yellow-500 hover:to-yellow-700"
                   size="lg"
                 >
@@ -332,6 +343,12 @@ export default function Play() {
       </main>
 
       <Footer />
+
+      <MatchmakingModal
+        isOpen={isMatchmakingOpen}
+        onClose={() => setIsMatchmakingOpen(false)}
+        gameMode={selectedGameMode}
+      />
     </div>
   );
 }
