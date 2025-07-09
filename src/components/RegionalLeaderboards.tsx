@@ -1,5 +1,12 @@
 import { Card, CardContent } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { useState } from "react";
 
 interface Team {
   rank: number;
@@ -49,14 +56,14 @@ const mockTeams: Team[] = [
 ];
 
 const regions = [
-  { id: "moscow", name: "Москва", teams: mockTeams },
-  { id: "spb", name: "СПб", teams: [] },
-  { id: "ekb", name: "Екб", teams: [] },
-  { id: "nsk", name: "Нск", teams: [] },
-  { id: "kazan", name: "Казань", teams: [] },
-  { id: "nnovgorod", name: "Н.Новгород", teams: [] },
-  { id: "sochi", name: "Сочи", teams: [] },
-  { id: "rostov", name: "Ростов", teams: [] },
+  { id: "central", name: "Центральный ФО", teams: mockTeams },
+  { id: "northwest", name: "Северо-Западный ФО", teams: [] },
+  { id: "volga", name: "Приволжский ФО", teams: [] },
+  { id: "southern", name: "Южный ФО", teams: [] },
+  { id: "north-caucasus", name: "Северо-Кавказский ФО", teams: [] },
+  { id: "ural", name: "Уральский ФО", teams: [] },
+  { id: "siberian", name: "Сибирский ФО", teams: [] },
+  { id: "far-eastern", name: "Дальневосточный ФО", teams: [] },
 ];
 
 function TeamsList({ teams }: { teams: Team[] }) {
@@ -107,6 +114,11 @@ function TeamsList({ teams }: { teams: Team[] }) {
 }
 
 export default function RegionalLeaderboards() {
+  const [selectedRegion, setSelectedRegion] = useState("central");
+
+  const currentRegion =
+    regions.find((r) => r.id === selectedRegion) || regions[0];
+
   return (
     <section className="py-16 bg-zinc-900/50">
       <div className="container mx-auto px-4">
@@ -119,29 +131,31 @@ export default function RegionalLeaderboards() {
           </p>
         </div>
 
-        <Tabs defaultValue="moscow" className="w-full">
-          <TabsList className="grid grid-cols-4 lg:grid-cols-8 w-full max-w-4xl mx-auto mb-8 bg-zinc-800">
-            {regions.map((region) => (
-              <TabsTrigger
-                key={region.id}
-                value={region.id}
-                className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-yellow-400 data-[state=active]:to-yellow-600 data-[state=active]:text-black text-xs"
-              >
-                {region.name}
-              </TabsTrigger>
-            ))}
-          </TabsList>
+        <div className="max-w-md mx-auto mb-8">
+          <Select value={selectedRegion} onValueChange={setSelectedRegion}>
+            <SelectTrigger className="w-full bg-zinc-800 border-zinc-700 text-white">
+              <SelectValue placeholder="Выберите регион" />
+            </SelectTrigger>
+            <SelectContent className="bg-zinc-800 border-zinc-700">
+              {regions.map((region) => (
+                <SelectItem
+                  key={region.id}
+                  value={region.id}
+                  className="text-white hover:bg-zinc-700 focus:bg-zinc-700"
+                >
+                  {region.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
 
-          {regions.map((region) => (
-            <TabsContent
-              key={region.id}
-              value={region.id}
-              className="space-y-4"
-            >
-              <TeamsList teams={region.teams} />
-            </TabsContent>
-          ))}
-        </Tabs>
+        <div className="max-w-4xl mx-auto">
+          <h4 className="text-xl font-semibold mb-6 text-center text-yellow-400">
+            {currentRegion.name}
+          </h4>
+          <TeamsList teams={currentRegion.teams} />
+        </div>
       </div>
     </section>
   );

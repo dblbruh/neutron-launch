@@ -17,7 +17,6 @@ interface GameMode {
   players: string;
   duration: string;
   icon: string;
-  difficulty: "easy" | "medium" | "hard";
 }
 
 const gameModes: GameMode[] = [
@@ -28,7 +27,6 @@ const gameModes: GameMode[] = [
     players: "1 vs 1",
     duration: "15-30 мин",
     icon: "User",
-    difficulty: "easy",
   },
   {
     id: "team",
@@ -37,7 +35,6 @@ const gameModes: GameMode[] = [
     players: "5 vs 5",
     duration: "30-45 мин",
     icon: "Users",
-    difficulty: "medium",
   },
   {
     id: "tournament",
@@ -46,15 +43,8 @@ const gameModes: GameMode[] = [
     players: "5 vs 5",
     duration: "60-90 мин",
     icon: "Trophy",
-    difficulty: "hard",
   },
 ];
-
-const difficultyColors = {
-  easy: "text-green-400",
-  medium: "text-yellow-400",
-  hard: "text-red-400",
-};
 
 interface RankTier {
   name: string;
@@ -190,16 +180,6 @@ export default function Play() {
                   <div className="flex justify-between items-center">
                     <span className="text-zinc-400">Время:</span>
                     <span className="text-white">{mode.duration}</span>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-zinc-400">Сложность:</span>
-                    <span
-                      className={`font-semibold ${difficultyColors[mode.difficulty]}`}
-                    >
-                      {mode.difficulty === "easy" && "Легкая"}
-                      {mode.difficulty === "medium" && "Средняя"}
-                      {mode.difficulty === "hard" && "Сложная"}
-                    </span>
                   </div>
                 </div>
 
