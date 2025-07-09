@@ -70,58 +70,99 @@ function MatchCard({
   match: Match;
   roundIndex: number;
 }) {
+  const getTeamClass = (teamScore?: number, opponentScore?: number) => {
+    if (
+      match.status === "completed" &&
+      teamScore !== undefined &&
+      opponentScore !== undefined
+    ) {
+      return teamScore > opponentScore
+        ? "text-green-400 font-semibold"
+        : "text-zinc-400";
+    }
+    return "text-zinc-200";
+  };
+
   return (
     <div className="relative">
-      <Card className="bg-zinc-800/50 border-zinc-700 hover:border-zinc-600 transition-colors w-48">
-        <CardContent className="p-3">
-          <div className="space-y-2">
+      <Card className="bg-zinc-800/80 border border-zinc-700/60 hover:border-zinc-600/80 hover:bg-zinc-800/90 transition-all duration-200 w-52 shadow-lg hover:shadow-xl">
+        <CardContent className="p-4">
+          <div className="space-y-3">
+            {/* Команда 1 */}
             <div className="flex items-center justify-between">
-              <span className="text-sm text-zinc-400 truncate">
+              <span
+                className={`text-sm font-medium truncate max-w-[140px] ${getTeamClass(
+                  match.score1,
+                  match.score2,
+                )}`}
+              >
                 {match.team1 || "TBD"}
               </span>
               {match.score1 !== undefined && (
-                <span className="text-sm font-mono text-white ml-2">
+                <span
+                  className={`text-lg font-bold font-mono min-w-[24px] text-center ${getTeamClass(
+                    match.score1,
+                    match.score2,
+                  )}`}
+                >
                   {match.score1}
                 </span>
               )}
             </div>
 
-            <div className="border-t border-zinc-600"></div>
+            {/* Разделительная линия */}
+            <div className="border-t border-zinc-600/60"></div>
 
+            {/* Команда 2 */}
             <div className="flex items-center justify-between">
-              <span className="text-sm text-zinc-400 truncate">
+              <span
+                className={`text-sm font-medium truncate max-w-[140px] ${getTeamClass(
+                  match.score2,
+                  match.score1,
+                )}`}
+              >
                 {match.team2 || "TBD"}
               </span>
               {match.score2 !== undefined && (
-                <span className="text-sm font-mono text-white ml-2">
+                <span
+                  className={`text-lg font-bold font-mono min-w-[24px] text-center ${getTeamClass(
+                    match.score2,
+                    match.score1,
+                  )}`}
+                >
                   {match.score2}
                 </span>
               )}
             </div>
 
-            {match.status === "ongoing" && (
-              <Badge className="bg-blue-500/20 text-blue-400 border-blue-500/30 text-xs w-full justify-center">
-                Идет
-              </Badge>
-            )}
-            {match.status === "completed" && match.winner && (
-              <Badge className="bg-green-500/20 text-green-400 border-green-500/30 text-xs w-full justify-center">
-                Завершен
-              </Badge>
-            )}
-            {match.status === "pending" && (
-              <Badge className="bg-zinc-500/20 text-zinc-400 border-zinc-500/30 text-xs w-full justify-center">
-                Ожидание
-              </Badge>
-            )}
+            {/* Статус матча */}
+            <div className="pt-1">
+              {match.status === "ongoing" && (
+                <Badge className="bg-blue-500/20 text-blue-400 border-blue-500/40 text-xs w-full justify-center py-1 font-medium">
+                  🔴 Идет
+                </Badge>
+              )}
+              {match.status === "completed" && match.winner && (
+                <Badge className="bg-green-500/20 text-green-400 border-green-500/40 text-xs w-full justify-center py-1 font-medium">
+                  ✅ Завершен
+                </Badge>
+              )}
+              {match.status === "pending" && (
+                <Badge className="bg-zinc-500/20 text-zinc-400 border-zinc-500/40 text-xs w-full justify-center py-1 font-medium">
+                  ⏳ Ожидание
+                </Badge>
+              )}
+            </div>
           </div>
         </CardContent>
       </Card>
 
-      {/* Линии соединения к следующему раунду */}
+      {/* Улучшенные линии соединения */}
       {roundIndex < 5 && (
-        <div className="absolute top-1/2 left-full w-8 h-px bg-zinc-600 transform -translate-y-1/2">
-          <div className="absolute right-0 top-0 w-2 h-px bg-zinc-600"></div>
+        <div className="absolute top-1/2 left-full transform -translate-y-1/2">
+          <div className="w-12 h-0.5 bg-gradient-to-r from-zinc-500 to-zinc-600">
+            <div className="absolute right-0 top-1/2 transform -translate-y-1/2 w-2 h-2 bg-zinc-500 rounded-full"></div>
+          </div>
         </div>
       )}
     </div>
@@ -137,27 +178,80 @@ function RoundConnectors({
 }) {
   if (roundIndex >= 5) return null;
 
-  const connectorHeight = 80 + Math.pow(2, roundIndex) * 20;
+  const connectorHeight = 100 + Math.pow(2, roundIndex) * 24;
+  const connectorSpacing = Math.pow(2, roundIndex + 1) * 20;
 
   return (
     <div
-      className="flex flex-col justify-center space-y-4"
+      className="flex flex-col justify-center"
       style={{
-        height: `${matchCount * (connectorHeight + 16)}px`,
-        paddingTop: `${roundIndex * 40 + connectorHeight / 4}px`,
+        height: `${matchCount * (connectorHeight + connectorSpacing)}px`,
+        paddingTop: `${roundIndex * 50 + connectorHeight / 3}px`,
+        gap: `${connectorSpacing}px`,
       }}
     >
       {Array.from({ length: Math.ceil(matchCount / 2) }, (_, i) => (
         <div key={i} className="relative">
-          <div
-            className="border-l-2 border-zinc-600 border-b-2 border-r-2"
-            style={{
-              height: `${connectorHeight}px`,
-              width: "32px",
-            }}
-          >
-            <div className="absolute bottom-0 right-0 w-2 h-px bg-zinc-600"></div>
-          </div>
+          <svg width="48" height={connectorHeight} className="overflow-visible">
+            {/* Вертикальная левая линия */}
+            <line
+              x1="0"
+              y1="0"
+              x2="0"
+              y2={connectorHeight}
+              stroke="#52525b"
+              strokeWidth="2"
+              className="drop-shadow-sm"
+            />
+            {/* Горизонтальная верхняя линия */}
+            <line
+              x1="0"
+              y1={connectorHeight / 4}
+              x2="48"
+              y2={connectorHeight / 4}
+              stroke="#52525b"
+              strokeWidth="2"
+              className="drop-shadow-sm"
+            />
+            {/* Горизонтальная нижняя линия */}
+            <line
+              x1="0"
+              y1={(connectorHeight * 3) / 4}
+              x2="48"
+              y2={(connectorHeight * 3) / 4}
+              stroke="#52525b"
+              strokeWidth="2"
+              className="drop-shadow-sm"
+            />
+            {/* Вертикальная соединительная линия */}
+            <line
+              x1="48"
+              y1={connectorHeight / 4}
+              x2="48"
+              y2={(connectorHeight * 3) / 4}
+              stroke="#52525b"
+              strokeWidth="2"
+              className="drop-shadow-sm"
+            />
+            {/* Финальная горизонтальная линия к следующему матчу */}
+            <line
+              x1="48"
+              y1={connectorHeight / 2}
+              x2="60"
+              y2={connectorHeight / 2}
+              stroke="#52525b"
+              strokeWidth="2"
+              className="drop-shadow-sm"
+            />
+            {/* Точка соединения */}
+            <circle
+              cx="48"
+              cy={connectorHeight / 2}
+              r="3"
+              fill="#52525b"
+              className="drop-shadow-sm"
+            />
+          </svg>
         </div>
       ))}
     </div>
@@ -168,19 +262,25 @@ export default function TournamentBracket() {
   const bracket = createEmptyBracket();
 
   return (
-    <div className="w-full overflow-x-auto bg-zinc-900/20 rounded-lg p-6">
-      <div className="flex gap-16 min-w-max">
+    <div className="w-full overflow-x-auto bg-gradient-to-br from-zinc-900/30 to-zinc-800/20 rounded-xl p-8 border border-zinc-700/30">
+      <div className="flex gap-20 min-w-max">
         {bracket.map((round, roundIndex) => (
-          <div key={round.name} className="flex items-start gap-8">
+          <div key={round.name} className="flex items-start gap-12">
             <div className="flex flex-col items-center">
-              <h3 className="text-lg font-semibold text-center mb-6 text-yellow-400 bg-zinc-800/50 px-4 py-2 rounded-lg border border-zinc-700">
-                {round.name}
-              </h3>
+              {/* Заголовок раунда */}
+              <div className="relative mb-8">
+                <div className="absolute inset-0 bg-gradient-to-r from-yellow-400/20 to-yellow-500/20 blur-lg rounded-lg"></div>
+                <h3 className="relative text-lg font-bold text-center text-yellow-400 bg-zinc-800/80 px-6 py-3 rounded-lg border border-yellow-500/30 backdrop-blur-sm shadow-lg">
+                  {round.name}
+                </h3>
+              </div>
+
+              {/* Матчи раунда */}
               <div
-                className="flex flex-col justify-center gap-4"
+                className="flex flex-col justify-center"
                 style={{
-                  paddingTop: `${roundIndex * 40}px`,
-                  gap: `${Math.pow(2, roundIndex) * 16 + 16}px`,
+                  paddingTop: `${roundIndex * 50}px`,
+                  gap: `${Math.pow(2, roundIndex) * 20 + 20}px`,
                 }}
               >
                 {round.matches.map((match, matchIndex) => (
@@ -204,25 +304,31 @@ export default function TournamentBracket() {
         ))}
       </div>
 
-      {/* Легенда */}
-      <div className="flex justify-center gap-6 mt-8 pt-6 border-t border-zinc-700">
-        <div className="flex items-center gap-2">
-          <Badge className="bg-zinc-500/20 text-zinc-400 border-zinc-500/30 text-xs">
-            Ожидание
+      {/* Улучшенная легенда */}
+      <div className="flex flex-wrap justify-center gap-8 mt-12 pt-8 border-t border-zinc-700/50">
+        <div className="flex items-center gap-3 bg-zinc-800/40 px-4 py-2 rounded-lg border border-zinc-700/40">
+          <Badge className="bg-zinc-500/20 text-zinc-400 border-zinc-500/40 text-xs px-2 py-1">
+            ⏳ Ожидание
           </Badge>
-          <span className="text-zinc-400 text-sm">Матч не начался</span>
+          <span className="text-zinc-300 text-sm font-medium">
+            Матч не начался
+          </span>
         </div>
-        <div className="flex items-center gap-2">
-          <Badge className="bg-blue-500/20 text-blue-400 border-blue-500/30 text-xs">
-            Идет
+        <div className="flex items-center gap-3 bg-zinc-800/40 px-4 py-2 rounded-lg border border-zinc-700/40">
+          <Badge className="bg-blue-500/20 text-blue-400 border-blue-500/40 text-xs px-2 py-1">
+            🔴 Идет
           </Badge>
-          <span className="text-zinc-400 text-sm">Матч в процессе</span>
+          <span className="text-zinc-300 text-sm font-medium">
+            Матч в процессе
+          </span>
         </div>
-        <div className="flex items-center gap-2">
-          <Badge className="bg-green-500/20 text-green-400 border-green-500/30 text-xs">
-            Завершен
+        <div className="flex items-center gap-3 bg-zinc-800/40 px-4 py-2 rounded-lg border border-zinc-700/40">
+          <Badge className="bg-green-500/20 text-green-400 border-green-500/40 text-xs px-2 py-1">
+            ✅ Завершен
           </Badge>
-          <span className="text-zinc-400 text-sm">Матч завершен</span>
+          <span className="text-zinc-300 text-sm font-medium">
+            Матч завершен
+          </span>
         </div>
       </div>
     </div>
