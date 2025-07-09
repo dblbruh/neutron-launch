@@ -23,6 +23,11 @@ interface Player {
   rating: number;
   rank: string;
   avatar: string;
+  winRate: number;
+  kd: number;
+  wins: number;
+  losses: number;
+  isYou?: boolean;
 }
 
 interface MatchmakingStep {
@@ -79,15 +84,43 @@ const generateRandomPlayers = (): Player[] => {
   ];
   const ranks = ["Серебро", "Золото", "Рубин", "Элита"];
 
-  return Array.from({ length: 9 }, (_, i) => ({
-    id: `player-${i}`,
-    name:
-      names[Math.floor(Math.random() * names.length)] +
-      Math.floor(Math.random() * 1000),
-    rating: 2500 + Math.floor(Math.random() * 1000),
-    rank: ranks[Math.floor(Math.random() * ranks.length)],
-    avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=${i}`,
-  }));
+  // Создаем вас как первого игрока
+  const you: Player = {
+    id: "you",
+    name: "Вы",
+    rating: 2847,
+    rank: "Золото",
+    avatar: "you",
+    winRate: 63.7,
+    kd: 1.76,
+    wins: 156,
+    losses: 89,
+    isYou: true,
+  };
+
+  // Создаем остальных игроков
+  const otherPlayers = Array.from({ length: 9 }, (_, i) => {
+    const wins = 50 + Math.floor(Math.random() * 200);
+    const losses = 30 + Math.floor(Math.random() * 150);
+    const winRate = Math.round((wins / (wins + losses)) * 100 * 10) / 10;
+
+    return {
+      id: `player-${i}`,
+      name:
+        names[Math.floor(Math.random() * names.length)] +
+        Math.floor(Math.random() * 1000),
+      rating: 2500 + Math.floor(Math.random() * 800),
+      rank: ranks[Math.floor(Math.random() * ranks.length)],
+      avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=${i}`,
+      winRate,
+      kd: Math.round((0.8 + Math.random() * 1.5) * 100) / 100,
+      wins,
+      losses,
+      isYou: false,
+    };
+  });
+
+  return [you, ...otherPlayers];
 };
 
 export default function MatchmakingModal({
@@ -99,6 +132,8 @@ export default function MatchmakingModal({
   const [progress, setProgress] = useState(0);
   const [players, setPlayers] = useState<Player[]>([]);
   const [foundPlayers, setFoundPlayers] = useState(0);
+  const [yourTeam, setYourTeam] = useState<Player[]>([]);
+  const [enemyTeam, setEnemyTeam] = useState<Player[]>([]);
   const [selectedServer, setSelectedServer] = useState("");
   const [isSearching, setIsSearching] = useState(true);
 
@@ -114,6 +149,8 @@ export default function MatchmakingModal({
       setProgress(0);
       setPlayers([]);
       setFoundPlayers(0);
+      setYourTeam([]);
+      setEnemyTeam([]);
       setSelectedServer("");
       setIsSearching(true);
       return;
@@ -128,14 +165,26 @@ export default function MatchmakingModal({
         // Симуляция поиска игроков
         const playerTimer = setInterval(() => {
           setFoundPlayers((prev) => {
-            if (prev >= 9) {
+            if (prev >= 10) {
               clearInterval(playerTimer);
               setTimeout(() => setCurrentStep(1), 500);
-              return 9;
+              return 10;
             }
             return prev + 1;
           });
         }, 300);
+      } else if (step.id === "balancing") {
+        // Разделяем игроков на команды
+        const allPlayers = players;
+        const you = allPlayers.find((p) => p.isYou)!;
+        const others = allPlayers.filter((p) => !p.isYou);
+
+        // Ваша команда (вы + 4 случайных игрока)
+        const yourTeamPlayers = [you, ...others.slice(0, 4)];
+        const enemyTeamPlayers = others.slice(4, 9);
+
+        setYourTeam(yourTeamPlayers);
+        setEnemyTeam(enemyTeamPlayers);
       } else if (step.id === "server") {
         // Симуляция подбора сервера
         setTimeout(() => {
@@ -186,7 +235,7 @@ export default function MatchmakingModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="bg-zinc-900 border-zinc-800 text-white max-w-2xl">
+      <DialogContent className="bg-zinc-900 border-zinc-800 text-white max-w-4xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="text-2xl font-bold text-center">
             Поиск игры: {gameMode}
@@ -227,7 +276,7 @@ export default function MatchmakingModal({
           <div className="grid grid-cols-3 gap-4 text-center">
             <div>
               <div className="text-2xl font-bold text-yellow-400">
-                {foundPlayers}/9
+                {foundPlayers}/10
               </div>
               <div className="text-sm text-zinc-400">Игроки найдены</div>
             </div>
@@ -243,8 +292,143 @@ export default function MatchmakingModal({
             </div>
           </div>
 
-          {/* Список игроков */}
-          {foundPlayers > 0 && (
+          {/* Команды */}
+          {currentStep >= 1 && yourTeam.length > 0 && enemyTeam.length > 0 ? (
+            <div className="space-y-4">
+              <h4 className="text-lg font-semibold text-center">
+                Команды сформированы
+              </h4>
+
+              <div className="grid md:grid-cols-2 gap-6">
+                {/* Ваша команда */}
+                <div className="space-y-3">
+                  <h5 className="text-md font-semibold text-blue-400 text-center">
+                    Ваша команда
+                  </h5>
+                  <div className="space-y-2">
+                    {yourTeam.map((player) => (
+                      <div
+                        key={player.id}
+                        className={`p-3 rounded-lg border ${
+                          player.isYou
+                            ? "bg-blue-500/10 border-blue-500/30"
+                            : "bg-zinc-800/50 border-zinc-700/50"
+                        }`}
+                      >
+                        <div className="flex items-center justify-between mb-2">
+                          <div className="flex items-center space-x-2">
+                            <div className="w-6 h-6 bg-gradient-to-br from-blue-400/20 to-blue-600/20 rounded-full flex items-center justify-center">
+                              {player.isYou ? (
+                                <Icon
+                                  name="User"
+                                  size={12}
+                                  className="text-blue-400"
+                                />
+                              ) : (
+                                <Icon
+                                  name="Users"
+                                  size={12}
+                                  className="text-blue-400"
+                                />
+                              )}
+                            </div>
+                            <span
+                              className={`font-medium ${player.isYou ? "text-blue-400" : "text-white"}`}
+                            >
+                              {player.name}
+                            </span>
+                            {player.isYou && (
+                              <Badge className="bg-blue-500/20 text-blue-400 border-blue-500/30 text-xs px-1 py-0">
+                                ВЫ
+                              </Badge>
+                            )}
+                          </div>
+                          <span className="text-sm font-medium">
+                            {player.rating}
+                          </span>
+                        </div>
+
+                        <div className="grid grid-cols-3 gap-2 text-xs">
+                          <div className="text-center">
+                            <div className="text-white font-medium">
+                              {player.winRate}%
+                            </div>
+                            <div className="text-zinc-400">Винрейт</div>
+                          </div>
+                          <div className="text-center">
+                            <div className="text-white font-medium">
+                              {player.kd}
+                            </div>
+                            <div className="text-zinc-400">K/D</div>
+                          </div>
+                          <div className="text-center">
+                            <div className="text-white font-medium">
+                              {player.wins}
+                            </div>
+                            <div className="text-zinc-400">Побед</div>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Команда противника */}
+                <div className="space-y-3">
+                  <h5 className="text-md font-semibold text-red-400 text-center">
+                    Команда противника
+                  </h5>
+                  <div className="space-y-2">
+                    {enemyTeam.map((player) => (
+                      <div
+                        key={player.id}
+                        className="p-3 bg-zinc-800/50 border border-zinc-700/50 rounded-lg"
+                      >
+                        <div className="flex items-center justify-between mb-2">
+                          <div className="flex items-center space-x-2">
+                            <div className="w-6 h-6 bg-gradient-to-br from-red-400/20 to-red-600/20 rounded-full flex items-center justify-center">
+                              <Icon
+                                name="Users"
+                                size={12}
+                                className="text-red-400"
+                              />
+                            </div>
+                            <span className="font-medium text-white">
+                              {player.name}
+                            </span>
+                          </div>
+                          <span className="text-sm font-medium">
+                            {player.rating}
+                          </span>
+                        </div>
+
+                        <div className="grid grid-cols-3 gap-2 text-xs">
+                          <div className="text-center">
+                            <div className="text-white font-medium">
+                              {player.winRate}%
+                            </div>
+                            <div className="text-zinc-400">Винрейт</div>
+                          </div>
+                          <div className="text-center">
+                            <div className="text-white font-medium">
+                              {player.kd}
+                            </div>
+                            <div className="text-zinc-400">K/D</div>
+                          </div>
+                          <div className="text-center">
+                            <div className="text-white font-medium">
+                              {player.wins}
+                            </div>
+                            <div className="text-zinc-400">Побед</div>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+          ) : foundPlayers > 0 && currentStep === 0 ? (
             <div className="space-y-3">
               <h4 className="text-lg font-semibold">Найденные игроки:</h4>
               <div className="max-h-40 overflow-y-auto space-y-2">
@@ -260,7 +444,11 @@ export default function MatchmakingModal({
                         </span>
                       </div>
                       <div>
-                        <div className="font-medium">{player.name}</div>
+                        <div
+                          className={`font-medium ${player.isYou ? "text-blue-400" : "text-white"}`}
+                        >
+                          {player.name}
+                        </div>
                         <div className="text-xs text-zinc-400">
                           {player.rank}
                         </div>
@@ -271,7 +459,7 @@ export default function MatchmakingModal({
                 ))}
               </div>
             </div>
-          )}
+          ) : null}
 
           {/* Сервер */}
           {selectedServer && (
