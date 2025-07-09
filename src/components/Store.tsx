@@ -79,37 +79,250 @@ const products: Product[] = [
 ];
 
 const skins: Skin[] = [
+  // AK-47 скины
   {
-    id: "classic-red",
-    name: "Классическая красная",
-    price: 50,
-    description: "Стандартная красная форма команды",
+    id: "ak47-redline",
+    name: "AK-47 | Redline",
+    price: 250,
+    description: "Классический красный дизайн с белыми линиями",
     image: "🔴",
-    rarity: "common",
-  },
-  {
-    id: "neon-blue",
-    name: "Неоновая синяя",
-    price: 120,
-    description: "Яркая синяя форма с неоновыми элементами",
-    image: "🔵",
     rarity: "rare",
   },
   {
-    id: "golden-elite",
-    name: "Золотая элита",
-    price: 250,
-    description: "Престижная золотая форма для топ-игроков",
-    image: "🟡",
+    id: "ak47-fire-serpent",
+    name: "AK-47 | Fire Serpent",
+    price: 8500,
+    description: "Огненный змей - самый иконичный скин",
+    image: "🔥",
+    rarity: "legendary",
+  },
+  {
+    id: "ak47-hydroponic",
+    name: "AK-47 | Hydroponic",
+    price: 1200,
+    description: "Зелёный лист с ярким дизайном",
+    image: "🌿",
     rarity: "epic",
   },
   {
-    id: "diamond-legend",
-    name: "Алмазная легенда",
-    price: 500,
-    description: "Легендарная алмазная форма высшего ранга",
-    image: "💎",
+    id: "ak47-bloodsport",
+    name: "AK-47 | Bloodsport",
+    price: 400,
+    description: "Кровавый спорт с редким паттерном",
+    image: "🩸",
+    rarity: "epic",
+  },
+  {
+    id: "ak47-vulcan",
+    name: "AK-47 | Vulcan",
+    price: 800,
+    description: "Металлический блеск с чёрными вставками",
+    image: "⚔️",
+    rarity: "epic",
+  },
+
+  // M4A4 скины
+  {
+    id: "m4a4-howl",
+    name: "M4A4 | Howl",
+    price: 12000,
+    description: "Легендарный запрещённый скин",
+    image: "🐺",
     rarity: "legendary",
+  },
+  {
+    id: "m4a4-asiimov",
+    name: "M4A4 | Asiimov",
+    price: 650,
+    description: "Бело-оранжевый футуристический дизайн",
+    image: "🤖",
+    rarity: "epic",
+  },
+  {
+    id: "m4a4-dragon-king",
+    name: "M4A4 | Dragon King",
+    price: 180,
+    description: "Китайский дракон с золотыми деталями",
+    image: "🐉",
+    rarity: "rare",
+  },
+  {
+    id: "m4a4-neo-noir",
+    name: "M4A4 | Neo-Noir",
+    price: 320,
+    description: "Чёрно-белый стиль ноар",
+    image: "🎨",
+    rarity: "rare",
+  },
+  {
+    id: "m4a4-bullet-rain",
+    name: "M4A4 | Bullet Rain",
+    price: 90,
+    description: "Камуфляж с пулями и кровью",
+    image: "🌧️",
+    rarity: "common",
+  },
+
+  // AWP скины
+  {
+    id: "awp-dragon-lore",
+    name: "AWP | Dragon Lore",
+    price: 15000,
+    description: "Легендарный дракон - мечта любого снайпера",
+    image: "🐲",
+    rarity: "legendary",
+  },
+  {
+    id: "awp-asiimov",
+    name: "AWP | Asiimov",
+    price: 950,
+    description: "Классический бело-оранжевый Asiimov",
+    image: "🎯",
+    rarity: "epic",
+  },
+  {
+    id: "awp-hyper-beast",
+    name: "AWP | Hyper Beast",
+    price: 420,
+    description: "Яркий монстр в неоновых цветах",
+    image: "👾",
+    rarity: "epic",
+  },
+  {
+    id: "awp-lightning-strike",
+    name: "AWP | Lightning Strike",
+    price: 380,
+    description: "Молния на чёрном фоне",
+    image: "⚡",
+    rarity: "rare",
+  },
+  {
+    id: "awp-redline",
+    name: "AWP | Redline",
+    price: 180,
+    description: "Красные линии на чёрном фоне",
+    image: "🔴",
+    rarity: "rare",
+  },
+
+  // Пистолеты
+  {
+    id: "glock-fade",
+    name: "Glock-18 | Fade",
+    price: 1800,
+    description: "Легендарный градиент в розово-жёлтых тонах",
+    image: "🌈",
+    rarity: "legendary",
+  },
+  {
+    id: "deagle-blaze",
+    name: "Desert Eagle | Blaze",
+    price: 3200,
+    description: "Огненный дизайн на мощном пистолете",
+    image: "🔥",
+    rarity: "legendary",
+  },
+  {
+    id: "usp-kill-confirmed",
+    name: "USP-S | Kill Confirmed",
+    price: 650,
+    description: "Чёрно-красный камуфляж с черепами",
+    image: "☠️",
+    rarity: "epic",
+  },
+  {
+    id: "five-seven-monkey-business",
+    name: "Five-SeveN | Monkey Business",
+    price: 120,
+    description: "Весёлые обезьянки на пистолете",
+    image: "🐵",
+    rarity: "common",
+  },
+
+  // Ножи
+  {
+    id: "karambit-fade",
+    name: "Karambit | Fade",
+    price: 18000,
+    description: "Легендарный карамбит с градиентом",
+    image: "🗡️",
+    rarity: "legendary",
+  },
+  {
+    id: "butterfly-crimson-web",
+    name: "Butterfly | Crimson Web",
+    price: 9500,
+    description: "Красная паутина на ноже-бабочке",
+    image: "🪷",
+    rarity: "legendary",
+  },
+  {
+    id: "m9-doppler",
+    name: "M9 Bayonet | Doppler",
+    price: 4500,
+    description: "Фазовые переливы на классическом ноже",
+    image: "🌌",
+    rarity: "legendary",
+  },
+  {
+    id: "huntsman-case-hardened",
+    name: "Huntsman | Case Hardened",
+    price: 850,
+    description: "Синие пятна на закалённом металле",
+    image: "🔵",
+    rarity: "epic",
+  },
+  {
+    id: "flip-ultraviolet",
+    name: "Flip Knife | Ultraviolet",
+    price: 320,
+    description: "Ультрафиолетовый оттенок на флип-ноже",
+    image: "🟣",
+    rarity: "rare",
+  },
+
+  // Пулемёты
+  {
+    id: "m249-nebula-crusader",
+    name: "M249 | Nebula Crusader",
+    price: 180,
+    description: "Космический крестоносец в туманности",
+    image: "🌌",
+    rarity: "rare",
+  },
+  {
+    id: "negev-power-loader",
+    name: "Negev | Power Loader",
+    price: 95,
+    description: "Мощный погрузчик в рабочих цветах",
+    image: "🛠️",
+    rarity: "common",
+  },
+
+  // Другие ружья
+  {
+    id: "p90-asiimov",
+    name: "P90 | Asiimov",
+    price: 280,
+    description: "Футуристический дизайн на пистолете-пулемёте",
+    image: "🤖",
+    rarity: "rare",
+  },
+  {
+    id: "galil-cerberus",
+    name: "Galil AR | Cerberus",
+    price: 450,
+    description: "Трёхглавый пёс ада на автомате",
+    image: "🐕",
+    rarity: "epic",
+  },
+  {
+    id: "famas-roll-cage",
+    name: "FAMAS | Roll Cage",
+    price: 65,
+    description: "Металлическая решётка в стиле гонок",
+    image: "🏁",
+    rarity: "common",
   },
 ];
 
@@ -220,7 +433,7 @@ export default function Store() {
           </p>
         </div>
 
-        <div className="grid lg:grid-cols-4 md:grid-cols-2 gap-6">
+        <div className="grid lg:grid-cols-6 md:grid-cols-4 sm:grid-cols-3 gap-4">
           {skins.map((skin) => {
             const canAfford = playerPoints >= skin.price;
 
@@ -231,38 +444,38 @@ export default function Store() {
                   !canAfford ? "opacity-60" : ""
                 }`}
               >
-                <CardHeader className="text-center pb-3">
-                  <div className="text-6xl mb-2">{skin.image}</div>
+                <CardHeader className="text-center pb-2 p-3">
+                  <div className="text-4xl mb-1">{skin.image}</div>
                   <Badge
                     variant="outline"
-                    className={`w-fit mx-auto mb-2 ${rarityColors[skin.rarity]}`}
+                    className={`w-fit mx-auto mb-1 text-xs ${rarityColors[skin.rarity]}`}
                   >
                     {rarityLabels[skin.rarity]}
                   </Badge>
-                  <CardTitle className="text-lg font-bold text-white">
+                  <CardTitle className="text-sm font-bold text-white leading-tight">
                     {skin.name}
                   </CardTitle>
-                  <CardDescription className="text-zinc-400 text-sm">
+                  <CardDescription className="text-zinc-400 text-xs leading-tight">
                     {skin.description}
                   </CardDescription>
                 </CardHeader>
 
-                <CardContent className="pt-0">
-                  <div className="text-center mb-4">
+                <CardContent className="pt-0 p-3">
+                  <div className="text-center mb-3">
                     <div className="flex items-center justify-center space-x-1">
                       <Icon
                         name="Coins"
-                        size={16}
+                        size={14}
                         className="text-yellow-400"
                       />
-                      <span className="text-xl font-bold text-white">
+                      <span className="text-lg font-bold text-white">
                         {skin.price}
                       </span>
                     </div>
                   </div>
 
                   <Button
-                    className={`w-full ${
+                    className={`w-full text-xs h-8 ${
                       canAfford
                         ? "bg-gradient-to-r from-yellow-400 to-yellow-600 text-black hover:from-yellow-500 hover:to-yellow-700"
                         : "bg-zinc-700 text-zinc-400 cursor-not-allowed"
@@ -271,13 +484,13 @@ export default function Store() {
                   >
                     {canAfford ? (
                       <>
-                        <Icon name="ShoppingBag" size={16} className="mr-2" />
+                        <Icon name="ShoppingBag" size={14} className="mr-1" />
                         Купить
                       </>
                     ) : (
                       <>
-                        <Icon name="Lock" size={16} className="mr-2" />
-                        Недостаточно баллов
+                        <Icon name="Lock" size={14} className="mr-1" />
+                        Недостаточно
                       </>
                     )}
                   </Button>

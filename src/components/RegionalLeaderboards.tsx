@@ -17,43 +17,7 @@ interface Team {
   players: string[];
 }
 
-const mockTeams: Team[] = [
-  {
-    rank: 1,
-    name: "NaVi Moscow",
-    rating: 2847,
-    matches: 156,
-    players: ["s1mple", "electronic", "perfecto", "b1t", "sdy"],
-  },
-  {
-    rank: 2,
-    name: "Gambit Legends",
-    rating: 2734,
-    matches: 143,
-    players: ["sh1ro", "nafany", "Ax1Le", "interz", "Hobbit"],
-  },
-  {
-    rank: 3,
-    name: "Spirit Force",
-    rating: 2689,
-    matches: 132,
-    players: ["chopper", "magixx", "donk", "sh1ro", "zont1x"],
-  },
-  {
-    rank: 4,
-    name: "Virtus.pro",
-    rating: 2567,
-    matches: 128,
-    players: ["Jame", "FL1T", "n0rb3r7", "fame", "qikert"],
-  },
-  {
-    rank: 5,
-    name: "Forze Team",
-    rating: 2445,
-    matches: 119,
-    players: ["shalfey", "Jerry", "zorte", "r3salt", "KENSI"],
-  },
-];
+const mockTeams: Team[] = [];
 
 const regions = [
   { id: "central", name: "Центральный ФО", teams: mockTeams },

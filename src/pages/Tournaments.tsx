@@ -1,14 +1,7 @@
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-import TournamentInfo from "@/components/TournamentInfo";
-import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import TournamentBracket from "@/components/TournamentBracket";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import Icon from "@/components/ui/icon";
 
@@ -89,122 +82,96 @@ export default function Tournaments() {
           </p>
         </div>
 
-        <TournamentInfo />
+        {/* Активные турниры - Турнирная сетка 1/32 */}
+        <div className="mt-16">
+          <h2 className="text-3xl font-bold mb-8 text-center">
+            Активные турниры
+          </h2>
+          <div className="mb-6 text-center">
+            <Badge className="bg-yellow-500/20 text-yellow-400 border-yellow-500/30 text-lg px-4 py-2">
+              Зимний чемпионат 2024
+            </Badge>
+            <p className="text-zinc-400 mt-2">Турнирная сетка на 32 команды</p>
+          </div>
 
+          <Card className="bg-zinc-900/30 border-zinc-800">
+            <CardHeader>
+              <CardTitle className="flex items-center justify-center text-2xl">
+                <Icon
+                  name="Trophy"
+                  size={24}
+                  className="mr-2 text-yellow-400"
+                />
+                Турнирная сетка
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <TournamentBracket />
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Все турниры - Результаты матчей */}
         <div className="mt-16">
           <h2 className="text-3xl font-bold mb-8 text-center">Все турниры</h2>
 
           <div className="grid lg:grid-cols-2 gap-8 max-w-6xl mx-auto">
-            {tournaments.map((tournament) => (
-              <Card
-                key={tournament.id}
-                className="bg-zinc-900/50 border-zinc-800 hover:border-yellow-500 transition-colors"
-              >
-                <CardHeader>
-                  <div className="flex items-start justify-between">
-                    <div>
-                      <CardTitle className="text-xl font-bold text-white mb-2">
-                        {tournament.name}
-                      </CardTitle>
-                      <CardDescription className="text-zinc-400">
-                        {tournament.description}
-                      </CardDescription>
+            {/* Результаты матчей */}
+            <Card className="bg-zinc-900/50 border-zinc-800">
+              <CardHeader>
+                <CardTitle className="flex items-center text-xl">
+                  <Icon
+                    name="Trophy"
+                    size={20}
+                    className="mr-2 text-yellow-400"
+                  />
+                  Результаты матчей
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {/* Пустые ячейки для результатов */}
+                {Array.from({ length: 8 }, (_, i) => (
+                  <div
+                    key={i}
+                    className="flex items-center justify-between p-3 bg-zinc-800/50 rounded-lg border border-zinc-700"
+                  >
+                    <div className="flex items-center space-x-3">
+                      <div className="w-2 h-2 bg-zinc-500 rounded-full"></div>
+                      <span className="text-zinc-400">TBD vs TBD</span>
                     </div>
-                    <Badge className={statusColors[tournament.status]}>
-                      {statusTexts[tournament.status]}
-                    </Badge>
+                    <div className="text-zinc-500 text-sm">--:--</div>
                   </div>
-                </CardHeader>
+                ))}
+              </CardContent>
+            </Card>
 
-                <CardContent>
-                  <div className="space-y-4">
-                    <div className="flex justify-between items-center">
-                      <span className="text-zinc-400">Призовой фонд:</span>
-                      <span className="text-2xl font-bold text-yellow-400">
-                        {tournament.prizePool}
-                      </span>
+            {/* Мини-сетка */}
+            <Card className="bg-zinc-900/50 border-zinc-800">
+              <CardHeader>
+                <CardTitle className="flex items-center text-xl">
+                  <Icon name="Zap" size={20} className="mr-2 text-yellow-400" />
+                  Турнирная сетка 1/32
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-4 gap-2">
+                  {/* Мини версия сетки */}
+                  {Array.from({ length: 32 }, (_, i) => (
+                    <div
+                      key={i}
+                      className="aspect-square bg-zinc-800/50 border border-zinc-700 rounded flex items-center justify-center text-xs text-zinc-500"
+                    >
+                      TBD
                     </div>
-
-                    <div className="flex justify-between items-center">
-                      <span className="text-zinc-400">Регион:</span>
-                      <span className="text-white">{tournament.region}</span>
-                    </div>
-
-                    <div className="flex justify-between items-center">
-                      <span className="text-zinc-400">Участники:</span>
-                      <span className="text-white">
-                        {tournament.participants}/{tournament.maxParticipants}
-                      </span>
-                    </div>
-
-                    <div className="flex justify-between items-center">
-                      <span className="text-zinc-400">Даты:</span>
-                      <span className="text-white">
-                        {tournament.startDate} - {tournament.endDate}
-                      </span>
-                    </div>
-
-                    <div className="pt-4">
-                      {tournament.status === "upcoming" && (
-                        <Button className="w-full bg-gradient-to-r from-yellow-400 to-yellow-600 text-black hover:from-yellow-500 hover:to-yellow-700">
-                          <Icon name="UserPlus" size={20} className="mr-2" />
-                          Зарегистрироваться
-                        </Button>
-                      )}
-                      {tournament.status === "active" && (
-                        <Button className="w-full bg-green-600 hover:bg-green-700">
-                          <Icon name="Eye" size={20} className="mr-2" />
-                          Смотреть турнир
-                        </Button>
-                      )}
-                      {tournament.status === "completed" && (
-                        <Button
-                          variant="outline"
-                          className="w-full border-zinc-700 text-zinc-300 hover:text-white"
-                        >
-                          <Icon name="Trophy" size={20} className="mr-2" />
-                          Результаты
-                        </Button>
-                      )}
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </div>
-
-        <div className="mt-16 bg-zinc-900/50 border border-zinc-800 rounded-lg p-8 max-w-4xl mx-auto">
-          <h3 className="text-2xl font-bold mb-6 text-center">
-            Как участвовать в турнирах
-          </h3>
-
-          <div className="grid md:grid-cols-3 gap-6">
-            <div className="text-center">
-              <div className="w-12 h-12 bg-gradient-to-br from-yellow-400/20 to-yellow-600/20 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Icon name="Users" size={24} className="text-yellow-400" />
-              </div>
-              <h4 className="text-lg font-semibold mb-2">
-                1. Создайте команду
-              </h4>
-              <p className="text-zinc-400">Соберите команду из 5 игроков</p>
-            </div>
-
-            <div className="text-center">
-              <div className="w-12 h-12 bg-gradient-to-br from-yellow-400/20 to-yellow-600/20 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Icon name="Target" size={24} className="text-yellow-400" />
-              </div>
-              <h4 className="text-lg font-semibold mb-2">2. Пройдите отбор</h4>
-              <p className="text-zinc-400">Играйте рейтинговые матчи</p>
-            </div>
-
-            <div className="text-center">
-              <div className="w-12 h-12 bg-gradient-to-br from-yellow-400/20 to-yellow-600/20 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Icon name="Trophy" size={24} className="text-yellow-400" />
-              </div>
-              <h4 className="text-lg font-semibold mb-2">3. Участвуйте</h4>
-              <p className="text-zinc-400">Сражайтесь за призы</p>
-            </div>
+                  ))}
+                </div>
+                <div className="mt-4 text-center">
+                  <p className="text-zinc-400 text-sm">
+                    32 команды будут бороться за победу
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
           </div>
         </div>
       </main>
