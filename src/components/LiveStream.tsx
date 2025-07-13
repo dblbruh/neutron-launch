@@ -1,25 +1,25 @@
-import React from 'react';
+импорт React от 'реагировать';
 
-interface LiveStreamProps {
-  src: string;
-  platform?: 'youtube' | 'twitch' | 'rutube' | 'vk' | 'custom';
+ИНЕРФЕР {
+  SRC: string;
+  platform?: 'YouTube' | 'подергивание' | 'Рутуб' | 'vk' | 'Обычай';
   title?: string;
   width?: string;
   height?: string;
 }
 
-const LiveStream: React.FC<LiveStreamProps> = ({
-  src,
-  platform = 'custom',
-  title = 'Прямая трансляция',
-  width = '100%',
-  height = '400px'
+констант LiveStream: React.Фк<Livestreamprops> = ({
+  SRC,Https://www.twitch.tv/dblbruh
+  platform = 'подергивание',
+  зagolovok = 'ПРЕДАМОВОЙ',
+  шyrina = '100%',
+  Вес = '400пк'
 }) => {
-  const getEmbedUrl = (url: string, platform: string) => {
-    switch (platform) {
-      case 'youtube':
-        // Извлекаем ID видео из URL
-        const youtubeId = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&\n?#]+)/)?.[1];
+  констант getEmbedUrl = (URL: нить, платкрама: нить) => {
+    Вес (платформа) {
+      Случай 'YouTube':
+        // Идж
+        констант youtubeId = URL.Сообщите(/(?:youtube \ .com \/watch \? v = | youtu \ .be \/) ([^&amp; \ n?#]+)/)?.[1];
         return youtubeId ? `https://www.youtube.com/embed/${youtubeId}?autoplay=1` : url;
       
       case 'twitch':
