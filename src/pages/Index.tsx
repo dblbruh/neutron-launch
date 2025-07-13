@@ -74,9 +74,9 @@ export default function Index() {
             🔴 Прямая трансляция
           </h2>
           <LiveStream 
-            src="https://www.youtube.com/watch?v=YOUR_VIDEO_ID"
-            platform="youtube"
-            title="Турнир по кибер-спорту - прямой эфир"
+            src="https://www.twitch.tv/dblbruh"
+            platform="twitch"
+            title="Стрим dblbruh - прямой эфир"
           />
           <div className="mt-4 text-center">
             <p className="text-gray-400 text-sm mb-2">
