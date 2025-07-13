@@ -63,7 +63,7 @@ export default function Hero() {
                 style={{ aspectRatio: "16/9" }}
               >
                 <iframe
-                  src="https://player.twitch.tv/?channel=esl_csgo&parent=localhost&parent=poehali.dev&muted=true"
+                  src="https://player.twitch.tv/?channel=dblbruh&parent=localhost&parent=poehali.dev&muted=true"
                   className="w-full h-full"
                   allowFullScreen
                   title="Twitch Stream"
