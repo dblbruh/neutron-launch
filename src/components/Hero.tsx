@@ -9,8 +9,8 @@ export default function Hero() {
     <section className="relative overflow-hidden">
       <div className="absolute inset-0 bg-gradient-to-r from-black via-black/80 to-transparent z-10"></div>
       <img
-        src="/img/ac38b80e-19db-43d1-a9f1-6361bf8739ca.jpg"
-        alt="Gaming Setup"
+        src="/img/bc708a3d-237b-4a10-be0c-a3d38acfac30.jpg"
+        alt="Esports Tournament Arena"
         className="absolute inset-0 w-full h-full object-cover opacity-40"
       />
       <div className="relative z-20 container mx-auto px-4 py-24 lg:py-32">
