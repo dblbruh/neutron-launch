@@ -3,8 +3,11 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import Icon from "@/components/ui/icon";
 import PlayerStats from "@/components/PlayerStats";
+import { useNavigate } from "react-router-dom";
 
 export default function Hero() {
+  const navigate = useNavigate();
+
   return (
     <section className="relative overflow-hidden">
       <div className="absolute inset-0 bg-gradient-to-r from-black via-black/80 to-transparent z-10"></div>
@@ -29,6 +32,7 @@ export default function Hero() {
             <Button
               size="lg"
               className="bg-gradient-to-r from-yellow-400 to-yellow-600 text-black hover:from-yellow-500 hover:to-yellow-700 text-lg px-8"
+              onClick={() => navigate('/play')}
             >
               <Icon name="Play" size={20} className="mr-2" />
               Начать играть
@@ -37,6 +41,7 @@ export default function Hero() {
               size="lg"
               variant="outline"
               className="border-zinc-700 text-zinc-300 hover:text-white text-lg px-8"
+              onClick={() => navigate('/tournaments')}
             >
               <Icon name="Trophy" size={20} className="mr-2" />
               Турниры
