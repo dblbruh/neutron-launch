@@ -59,15 +59,17 @@ export default function Hero() {
             </CardHeader>
             <CardContent>
               <div
-                className="relative bg-zinc-800 rounded-lg overflow-hidden"
+                className="relative bg-zinc-800 rounded-lg overflow-hidden cursor-pointer group"
                 style={{ aspectRatio: "16/9" }}
+                onClick={() => window.open('https://www.twitch.tv/dblbruh', '_blank')}
               >
-                <iframe
-                  src="https://player.twitch.tv/?channel=dblbruh&parent=localhost&parent=poehali.dev&muted=true"
-                  className="w-full h-full"
-                  allowFullScreen
-                  title="Twitch Stream"
-                ></iframe>
+                <div className="w-full h-full bg-gradient-to-br from-purple-900/40 to-blue-900/40 flex flex-col items-center justify-center">
+                  <Icon name="Play" size={48} className="text-purple-400 group-hover:text-purple-300 transition-colors mb-4" />
+                  <div className="text-center">
+                    <div className="text-white font-medium text-lg mb-2">Смотреть на Twitch</div>
+                    <div className="text-zinc-300 text-sm">Нажмите для перехода к прямой трансляции</div>
+                  </div>
+                </div>
                 <div className="absolute top-3 left-3">
                   <Badge className="bg-red-500/80 text-white border-red-500">
                     <div className="w-2 h-2 bg-white rounded-full mr-2 animate-pulse"></div>
