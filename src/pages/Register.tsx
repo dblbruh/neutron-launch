@@ -10,9 +10,11 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import Icon from "@/components/ui/icon";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { incrementRegisteredUsers } from "@/utils/userStats";
 
 export default function Register() {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     username: "",
     email: "",
@@ -29,8 +31,19 @@ export default function Register() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // Здесь будет логика регистрации
-    console.log("Регистрация:", formData);
+    
+    // Проверяем совпадение паролей
+    if (formData.password !== formData.confirmPassword) {
+      alert("Пароли не совпадают!");
+      return;
+    }
+    
+    // Увеличиваем счетчик зарегистрированных пользователей
+    const newTotal = incrementRegisteredUsers();
+    console.log("Новый пользователь зарегистрирован! Всего пользователей:", newTotal);
+    
+    // Перенаправляем на главную страницу
+    navigate("/");
   };
 
   return (

@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import Icon from "@/components/ui/icon";
+import { getUserStats, simulateOnlineActivity } from "@/utils/userStats";
 
 interface PlayerStatsProps {
   className?: string;
@@ -11,16 +12,25 @@ export default function PlayerStats({ className }: PlayerStatsProps) {
   const [onlinePlayers, setOnlinePlayers] = useState(0);
 
   useEffect(() => {
-    const baseRegistered = 47853;
-    const baseOnline = 3247;
-
-    const updateStats = () => {
-      setRegisteredPlayers(baseRegistered + Math.floor(Math.random() * 100));
-      setOnlinePlayers(baseOnline + Math.floor(Math.random() * 200));
+    const fetchUserStats = async () => {
+      try {
+        const stats = getUserStats();
+        setRegisteredPlayers(stats.registered);
+        
+        // Симулируем активность онлайн пользователей
+        const onlineCount = simulateOnlineActivity();
+        setOnlinePlayers(onlineCount);
+      } catch (error) {
+        console.error('Ошибка получения статистики пользователей:', error);
+        setRegisteredPlayers(1);
+        setOnlinePlayers(1);
+      }
     };
 
-    updateStats();
-    const interval = setInterval(updateStats, 15000);
+    fetchUserStats();
+    
+    // Обновляем данные каждые 30 секунд
+    const interval = setInterval(fetchUserStats, 30000);
 
     return () => clearInterval(interval);
   }, []);
