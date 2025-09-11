@@ -4,7 +4,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import Icon from "@/components/ui/icon";
-import Layout from "@/components/Layout";
+import Header from "@/components/Header";
+import Footer from "@/components/Footer";
 import { cn } from "@/lib/utils";
 
 const challengeTypes = [
@@ -82,7 +83,8 @@ export default function Challenges() {
   };
 
   return (
-    <Layout>
+    <div className="min-h-screen bg-black text-white">
+      <Header />
       <div className="container mx-auto px-4 py-8">
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-white mb-2">
@@ -311,6 +313,7 @@ export default function Challenges() {
           </div>
         </div>
       </div>
-    </Layout>
+      <Footer />
+    </div>
   );
 }
