@@ -55,7 +55,12 @@ export default function Header() {
             >
               Рейтинг
             </Link>
-
+            <Link
+              to="/challenges"
+              className="text-zinc-300 hover:text-white transition-colors"
+            >
+              Вызовы
+            </Link>
             <Link
               to="/store"
               className="text-zinc-300 hover:text-white transition-colors"

@@ -10,6 +10,7 @@ import Friends from "./pages/Friends";
 import Profile from "./pages/Profile";
 import Leaderboard from "./pages/Leaderboard";
 import Tournaments from "./pages/Tournaments";
+import Challenges from "./pages/Challenges";
 import Store from "./pages/Store";
 import News from "./pages/News";
 import Login from "./pages/Login";
@@ -32,6 +33,7 @@ const App = () => (
           <Route path="/profile" element={<Profile />} />
           <Route path="/leaderboard" element={<Leaderboard />} />
           <Route path="/tournaments" element={<Tournaments />} />
+          <Route path="/challenges" element={<Challenges />} />
           <Route path="/store" element={<Store />} />
           <Route path="/news" element={<News />} />
           <Route path="/login" element={<Login />} />
