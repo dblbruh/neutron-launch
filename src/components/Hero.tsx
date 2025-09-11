@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import Icon from "@/components/ui/icon";
 import PlayerStats from "@/components/PlayerStats";
+import LiveStream from "@/components/LiveStream";
 import { useNavigate } from "react-router-dom";
 
 export default function Hero() {
@@ -63,35 +64,11 @@ export default function Hero() {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div
-                className="relative bg-zinc-800 rounded-lg overflow-hidden cursor-pointer group"
-                style={{ aspectRatio: "16/9" }}
-                onClick={() => window.open('https://www.twitch.tv/dblbruh', '_blank')}
-              >
-                <div className="w-full h-full bg-gradient-to-br from-purple-900/40 to-blue-900/40 flex flex-col items-center justify-center">
-                  <Icon name="Play" size={48} className="text-purple-400 group-hover:text-purple-300 transition-colors mb-4" />
-                  <div className="text-center">
-                    <div className="text-white font-medium text-lg mb-2">Смотреть на Twitch</div>
-                    <div className="text-zinc-300 text-sm">Нажмите для перехода к прямой трансляции</div>
-                  </div>
-                </div>
-                <div className="absolute top-3 left-3">
-                  <Badge className="bg-red-500/80 text-white border-red-500">
-                    <div className="w-2 h-2 bg-white rounded-full mr-2 animate-pulse"></div>
-                    В эфире
-                  </Badge>
-                </div>
-                <div className="absolute bottom-3 left-3 right-3">
-                  <div className="bg-black/70 backdrop-blur rounded p-2">
-                    <div className="text-white font-medium text-sm">
-                      Зимний чемпионат 2024
-                    </div>
-                    <div className="text-zinc-300 text-xs">
-                      Полуфинал • 64 команды
-                    </div>
-                  </div>
-                </div>
-              </div>
+              <LiveStream
+                src="https://www.twitch.tv/dblbruh"
+                platform="twitch"
+                title="Прямая трансляция турнира"
+              />
             </CardContent>
           </Card>
 
