@@ -1,10 +1,11 @@
-import { useState } from "react";
 import Icon from "@/components/ui/icon";
 import SkinCard from "./SkinCard";
 import { skins } from "./storeData";
+import { useAuth } from "@/hooks/useAuth";
 
 export default function SkinsSection() {
-  const [playerPoints] = useState(1560);
+  const { user } = useAuth();
+  const playerPoints = user?.points || 0;
 
   return (
     <section>

@@ -2,18 +2,19 @@ import { Button } from "@/components/ui/button";
 import Icon from "@/components/ui/icon";
 import { Link } from "react-router-dom";
 import { useState } from "react";
+import { useAuth } from "@/hooks/useAuth";
+import AuthModal from "@/components/auth/AuthModal";
 
 export default function Header() {
-  // Пока моксим состояние авторизации
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const { user, isAuthenticated, login, logout } = useAuth();
+  const [showAuthModal, setShowAuthModal] = useState(false);
 
-  const handleLogout = () => {
-    setIsAuthenticated(false);
-    // Здесь будет логика выхода
+  const handleAuthClick = () => {
+    setShowAuthModal(true);
   };
 
-  const handleLogin = () => {
-    setIsAuthenticated(true);
+  const handleAuthSuccess = (userData: any) => {
+    login(userData);
   };
 
   return (
@@ -75,9 +76,13 @@ export default function Header() {
             </Link>
           </div>
           <div className="flex items-center space-x-3">
-            {isAuthenticated ? (
+            {isAuthenticated && user ? (
               // Если пользователь авторизован
               <>
+                <div className="flex items-center space-x-2">
+                  <Icon name="Coins" size={16} className="text-yellow-400" />
+                  <span className="text-yellow-400 font-semibold">{user.points.toLocaleString()}</span>
+                </div>
                 <Link to="/profile">
                   <Button
                     variant="outline"
@@ -85,7 +90,7 @@ export default function Header() {
                     className="border-zinc-700 text-zinc-300 hover:text-white"
                   >
                     <Icon name="User" size={16} className="mr-2" />
-                    Профиль
+                    {user.displayName || user.username}
                   </Button>
                 </Link>
                 <Link to="/subscription">
@@ -97,7 +102,7 @@ export default function Header() {
                   </Button>
                 </Link>
                 <Button
-                  onClick={handleLogout}
+                  onClick={logout}
                   variant="outline"
                   size="sm"
                   className="border-zinc-700 text-zinc-300 hover:text-white"
@@ -109,29 +114,34 @@ export default function Header() {
             ) : (
               // Если пользователь не авторизован
               <>
-                <Link to="/login">
-                  <Button
-                    onClick={handleLogin}
-                    variant="outline"
-                    size="sm"
-                    className="border-zinc-700 text-zinc-300 hover:text-white"
-                  >
-                    <Icon name="LogIn" size={16} className="mr-2" />
-                    Вход
-                  </Button>
-                </Link>
-                <Link to="/register">
-                  <Button
-                    size="sm"
-                    className="bg-gradient-to-r from-yellow-400 to-yellow-600 text-black hover:from-yellow-500 hover:to-yellow-700"
-                  >
-                    <Icon name="UserPlus" size={16} className="mr-2" />
-                    Регистрация
-                  </Button>
-                </Link>
+                <Button
+                  onClick={handleAuthClick}
+                  variant="outline"
+                  size="sm"
+                  className="border-zinc-700 text-zinc-300 hover:text-white"
+                >
+                  <Icon name="LogIn" size={16} className="mr-2" />
+                  Вход
+                </Button>
+                <Button
+                  onClick={handleAuthClick}
+                  size="sm"
+                  className="bg-gradient-to-r from-yellow-400 to-yellow-600 text-black hover:from-yellow-500 hover:to-yellow-700"
+                >
+                  <Icon name="UserPlus" size={16} className="mr-2" />
+                  Регистрация
+                </Button>
               </>
             )}
           </div>
+        </nav>
+      </div>
+      
+      <AuthModal 
+        isOpen={showAuthModal}
+        onClose={() => setShowAuthModal(false)}
+        onAuth={handleAuthSuccess}
+      />
         </nav>
       </div>
     </header>
