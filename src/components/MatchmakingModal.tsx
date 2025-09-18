@@ -6,6 +6,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { useMatchmaking } from "@/hooks/useMatchmaking";
+import { useAuth } from "@/hooks/useAuth";
 import MatchmakingProgress from "./matchmaking/MatchmakingProgress";
 import MatchmakingStats from "./matchmaking/MatchmakingStats";
 import TeamsDisplay from "./matchmaking/TeamsDisplay";
@@ -19,6 +20,7 @@ export default function MatchmakingModal({
   onClose,
   gameMode,
 }: MatchmakingModalProps) {
+  const { user } = useAuth();
   const {
     currentStep,
     currentStepData,
@@ -29,9 +31,16 @@ export default function MatchmakingModal({
     enemyTeam,
     selectedServer,
     isSearching,
-  } = useMatchmaking(isOpen);
+    joinQueue,
+    leaveQueue,
+    matchFound,
+    opponent
+  } = useMatchmaking(isOpen, user?.id, gameMode);
 
   const handleCancel = () => {
+    if (isSearching) {
+      leaveQueue();
+    }
     onClose();
   };
 

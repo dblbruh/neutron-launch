@@ -1,0 +1,42 @@
+{
+  "tests": [
+    {
+      "name": "Get queue stats",
+      "method": "GET",
+      "expectedStatus": 200,
+      "expectedBody": {
+        "totalInQueue": "number",
+        "activeMatches": "number",
+        "matchesToday": "number"
+      },
+      "bodyMatcher": "partial"
+    },
+    {
+      "name": "Join matchmaking queue",
+      "method": "POST",
+      "body": {
+        "action": "join_queue",
+        "userId": 1,
+        "gameMode": "classic"
+      },
+      "expectedStatus": 200,
+      "expectedBody": {
+        "message": "string",
+        "status": "string"
+      },
+      "bodyMatcher": "partial"
+    },
+    {
+      "name": "Invalid action",
+      "method": "POST",
+      "body": {
+        "action": "invalid_action"
+      },
+      "expectedStatus": 400,
+      "expectedBody": {
+        "error": "string"
+      },
+      "bodyMatcher": "partial"
+    }
+  ]
+}

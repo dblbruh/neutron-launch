@@ -1,6 +1,6 @@
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-import MatchmakingModal from "@/components/MatchmakingModal";
+import GameMatchModal from "@/components/game/GameMatchModal";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -344,7 +344,7 @@ export default function Play() {
 
       <Footer />
 
-      <MatchmakingModal
+      <GameMatchModal
         isOpen={isMatchmakingOpen}
         onClose={() => setIsMatchmakingOpen(false)}
         gameMode={selectedGameMode}

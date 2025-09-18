@@ -1,0 +1,44 @@
+{
+  "tests": [
+    {
+      "name": "Get tournaments list",
+      "method": "GET",
+      "expectedStatus": 200,
+      "expectedBody": {
+        "tournaments": "array"
+      },
+      "bodyMatcher": "partial"
+    },
+    {
+      "name": "Create tournament",
+      "method": "POST",
+      "body": {
+        "action": "create",
+        "name": "Test Tournament",
+        "description": "Test description",
+        "gameMode": "classic",
+        "maxParticipants": 8,
+        "entryFee": 0,
+        "prizePool": 100
+      },
+      "expectedStatus": 201,
+      "expectedBody": {
+        "message": "string",
+        "tournamentId": "string"
+      },
+      "bodyMatcher": "partial"
+    },
+    {
+      "name": "Invalid action",
+      "method": "POST",
+      "body": {
+        "action": "invalid_action"
+      },
+      "expectedStatus": 400,
+      "expectedBody": {
+        "error": "string"
+      },
+      "bodyMatcher": "partial"
+    }
+  ]
+}
