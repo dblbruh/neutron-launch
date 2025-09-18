@@ -1,0 +1,22 @@
+{
+  "tests": [
+    {
+      "name": "Get player statistics",
+      "method": "GET",
+      "expectedStatus": 200,
+      "expectedBody": {
+        "totalPlayers": "number",
+        "activePlayers": "number", 
+        "onlinePlayers": "number",
+        "totalPoints": "number"
+      },
+      "bodyMatcher": "partial"
+    },
+    {
+      "name": "Handle OPTIONS request",
+      "method": "OPTIONS",
+      "expectedStatus": 200,
+      "expectedBody": ""
+    }
+  ]
+}
