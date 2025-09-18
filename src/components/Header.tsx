@@ -142,8 +142,6 @@ export default function Header() {
         onClose={() => setShowAuthModal(false)}
         onAuth={handleAuthSuccess}
       />
-        </nav>
-      </div>
     </header>
   );
 }
