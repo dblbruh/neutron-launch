@@ -117,6 +117,33 @@ export default function AuthModal({ isOpen, onClose, onAuth }: AuthModalProps) {
     }
   };
 
+  const handleSteamLogin = async () => {
+    setIsLoading(true);
+    setError("");
+    setSuccess("");
+
+    try {
+      const response = await fetch("https://functions.poehali.dev/0837df2f-ad96-4ef7-8d47-383e1f4464bb", {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (response.ok) {
+        const result = await response.json();
+        // Перенаправляем пользователя на Steam для авторизации
+        window.location.href = result.steamLoginUrl;
+      } else {
+        setError("Ошибка подключения к Steam");
+      }
+    } catch (err) {
+      setError("Ошибка подключения к серверу Steam");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-md bg-zinc-900 border-zinc-700">
@@ -126,6 +153,34 @@ export default function AuthModal({ isOpen, onClose, onAuth }: AuthModalProps) {
             <span>Вход в аккаунт</span>
           </DialogTitle>
         </DialogHeader>
+
+        <div className="space-y-4">
+          <Button
+            onClick={handleSteamLogin}
+            className="w-full bg-gradient-to-r from-blue-600 to-blue-800 hover:from-blue-700 hover:to-blue-900 text-white font-semibold py-3"
+            disabled={isLoading}
+          >
+            {isLoading ? (
+              <>
+                <Icon name="Loader2" size={20} className="mr-3 animate-spin" />
+                Подключение к Steam...
+              </>
+            ) : (
+              <>
+                <div className="mr-3 w-5 h-5 bg-white rounded-sm flex items-center justify-center">
+                  <span className="text-blue-600 text-xs font-bold">S</span>
+                </div>
+                Войти через Steam
+              </>
+            )}
+          </Button>
+          
+          <div className="flex items-center space-x-2">
+            <div className="flex-1 h-px bg-zinc-700"></div>
+            <span className="text-zinc-500 text-sm">или</span>
+            <div className="flex-1 h-px bg-zinc-700"></div>
+          </div>
+        </div>
 
         <Tabs defaultValue="login" className="w-full">
           <TabsList className="grid w-full grid-cols-2 bg-zinc-800">
