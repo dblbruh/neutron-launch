@@ -1,11 +1,20 @@
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import Icon from "@/components/ui/icon";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import UserSearch from "@/components/UserSearch";
 
 export default function Header() {
   const { user, isAuthenticated, logout } = useAuth();
   const navigate = useNavigate();
+  const [showSearch, setShowSearch] = useState(false);
 
   const handleLogout = () => {
     logout();
@@ -71,6 +80,15 @@ export default function Header() {
             </Link>
           </div>
           <div className="flex items-center space-x-3">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setShowSearch(true)}
+              className="text-zinc-400 hover:text-white"
+            >
+              <Icon name="Search" size={18} />
+            </Button>
+            
             {isAuthenticated && user ? (
               // Если пользователь авторизован
               <>
@@ -145,6 +163,15 @@ export default function Header() {
           </div>
         </nav>
       </div>
+      
+      <Dialog open={showSearch} onOpenChange={setShowSearch}>
+        <DialogContent className="bg-zinc-900 border-zinc-800">
+          <DialogHeader>
+            <DialogTitle className="text-white">Поиск игроков</DialogTitle>
+          </DialogHeader>
+          <UserSearch />
+        </DialogContent>
+      </Dialog>
     </header>
   );
 }

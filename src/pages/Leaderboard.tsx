@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -108,9 +109,10 @@ export default function Leaderboard() {
                       const rankInfo = getRankIcon(position);
                       
                       return (
-                        <div 
-                          key={player.id} 
-                          className="flex items-center space-x-4 p-4 rounded-lg bg-zinc-800/50 hover:bg-zinc-700/50 transition-colors"
+                        <Link
+                          key={player.id}
+                          to={`/user/${player.username}`}
+                          className="flex items-center space-x-4 p-4 rounded-lg bg-zinc-800/50 hover:bg-zinc-700/50 transition-colors cursor-pointer"
                         >
                           <div className="flex items-center space-x-3 min-w-0 flex-1">
                             <div className={`w-8 h-8 flex items-center justify-center ${position <= 3 ? 'text-2xl' : ''}`}>
@@ -162,7 +164,7 @@ export default function Leaderboard() {
                               <p className="text-zinc-500">уровень</p>
                             </div>
                           </div>
-                        </div>
+                        </Link>
                       );
                     })}
                   </div>

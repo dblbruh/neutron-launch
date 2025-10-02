@@ -4,6 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import Icon from "@/components/ui/icon";
 import PlayerStats from "@/components/PlayerStats";
 import LiveStream from "@/components/LiveStream";
+import UserSearch from "@/components/UserSearch";
 import { useNavigate } from "react-router-dom";
 
 export default function Hero() {
@@ -29,7 +30,7 @@ export default function Hero() {
             Участвуйте в крупнейших турнирах России. Отборочные туры, честный
             подбор игроков, региональные рейтинги и призы от собранных подписок.
           </p>
-          <div className="flex flex-col sm:flex-row gap-4 mb-12">
+          <div className="flex flex-col sm:flex-row gap-4 mb-8">
             <Button
               size="lg"
               className="bg-gradient-to-r from-yellow-400 to-yellow-600 text-black hover:from-yellow-500 hover:to-yellow-700 text-lg px-8"
@@ -48,6 +49,11 @@ export default function Hero() {
               Турниры
             </Button>
           </div>
+          
+          <div className="mb-12">
+            <UserSearch />
+          </div>
+          
           <PlayerStats />
         </div>
       </div>
