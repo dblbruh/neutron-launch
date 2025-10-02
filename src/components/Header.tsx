@@ -1,20 +1,15 @@
 import { Button } from "@/components/ui/button";
 import Icon from "@/components/ui/icon";
-import { Link } from "react-router-dom";
-import { useState } from "react";
-import { useAuth } from "@/hooks/useAuth";
-import AuthModal from "@/components/auth/AuthModal";
+import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "@/context/AuthContext";
 
 export default function Header() {
-  const { user, isAuthenticated, login, logout } = useAuth();
-  const [showAuthModal, setShowAuthModal] = useState(false);
+  const { user, isAuthenticated, logout } = useAuth();
+  const navigate = useNavigate();
 
-  const handleAuthClick = () => {
-    setShowAuthModal(true);
-  };
-
-  const handleAuthSuccess = (userData: any) => {
-    login(userData);
+  const handleLogout = () => {
+    logout();
+    navigate('/');
   };
 
   return (
@@ -102,7 +97,7 @@ export default function Header() {
                   </Button>
                 </Link>
                 <Button
-                  onClick={logout}
+                  onClick={handleLogout}
                   variant="outline"
                   size="sm"
                   className="border-zinc-700 text-zinc-300 hover:text-white"
@@ -114,34 +109,30 @@ export default function Header() {
             ) : (
               // Если пользователь не авторизован
               <>
-                <Button
-                  onClick={handleAuthClick}
-                  variant="outline"
-                  size="sm"
-                  className="border-zinc-700 text-zinc-300 hover:text-white"
-                >
-                  <Icon name="LogIn" size={16} className="mr-2" />
-                  Вход
-                </Button>
-                <Button
-                  onClick={handleAuthClick}
-                  size="sm"
-                  className="bg-gradient-to-r from-yellow-400 to-yellow-600 text-black hover:from-yellow-500 hover:to-yellow-700"
-                >
-                  <Icon name="UserPlus" size={16} className="mr-2" />
-                  Регистрация
-                </Button>
-              </>
+                <Link to="/login">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="border-zinc-700 text-zinc-300 hover:text-white"
+                  >
+                    <Icon name="LogIn" size={16} className="mr-2" />
+                    Вход
+                  </Button>
+                </Link>
+                <Link to="/register">
+                  <Button
+                    size="sm"
+                    className="bg-gradient-to-r from-yellow-400 to-yellow-600 text-black hover:from-yellow-500 hover:to-yellow-700"
+                  >
+                    <Icon name="UserPlus" size={16} className="mr-2" />
+                    Регистрация
+                  </Button>
+                </Link>
+              <>
             )}
           </div>
         </nav>
       </div>
-      
-      <AuthModal 
-        isOpen={showAuthModal}
-        onClose={() => setShowAuthModal(false)}
-        onAuth={handleAuthSuccess}
-      />
     </header>
   );
 }

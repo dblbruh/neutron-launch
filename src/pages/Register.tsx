@@ -11,10 +11,15 @@ import {
 } from "@/components/ui/card";
 import Icon from "@/components/ui/icon";
 import { Link, useNavigate } from "react-router-dom";
-import { incrementRegisteredUsers } from "@/utils/userStats";
+import { useAuth } from "@/context/AuthContext";
+import { useToast } from "@/hooks/use-toast";
+import func2url from "../../backend/func2url.json";
 
 export default function Register() {
   const navigate = useNavigate();
+  const { login } = useAuth();
+  const { toast } = useToast();
+  const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
     username: "",
     email: "",
@@ -29,21 +34,59 @@ export default function Register() {
     });
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Проверяем совпадение паролей
     if (formData.password !== formData.confirmPassword) {
-      alert("Пароли не совпадают!");
+      toast({
+        title: "Ошибка",
+        description: "Пароли не совпадают!",
+        variant: "destructive",
+      });
       return;
     }
-    
-    // Увеличиваем счетчик зарегистрированных пользователей
-    const newTotal = incrementRegisteredUsers();
-    console.log("Новый пользователь зарегистрирован! Всего пользователей:", newTotal);
-    
-    // Перенаправляем на главную страницу
-    navigate("/");
+
+    setIsLoading(true);
+
+    try {
+      const response = await fetch(func2url.auth, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          action: 'register',
+          username: formData.username,
+          email: formData.email,
+          password: formData.password,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        login(data.user);
+        toast({
+          title: "Регистрация успешна!",
+          description: `Добро пожаловать, ${data.user.displayName}!`,
+        });
+        navigate('/');
+      } else {
+        toast({
+          title: "Ошибка регистрации",
+          description: data.error || "Не удалось создать аккаунт",
+          variant: "destructive",
+        });
+      }
+    } catch (error) {
+      toast({
+        title: "Ошибка сети",
+        description: "Не удалось подключиться к серверу",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -77,6 +120,7 @@ export default function Register() {
                 placeholder="Введите имя пользователя"
                 className="bg-zinc-800/50 border-zinc-700 text-white placeholder:text-zinc-400"
                 required
+                disabled={isLoading}
               />
             </div>
 
@@ -93,6 +137,7 @@ export default function Register() {
                 placeholder="Введите email"
                 className="bg-zinc-800/50 border-zinc-700 text-white placeholder:text-zinc-400"
                 required
+                disabled={isLoading}
               />
             </div>
 
@@ -106,9 +151,11 @@ export default function Register() {
                 type="password"
                 value={formData.password}
                 onChange={handleChange}
-                placeholder="Введите пароль"
+                placeholder="Введите пароль (минимум 6 символов)"
                 className="bg-zinc-800/50 border-zinc-700 text-white placeholder:text-zinc-400"
                 required
+                minLength={6}
+                disabled={isLoading}
               />
             </div>
 
@@ -125,6 +172,8 @@ export default function Register() {
                 placeholder="Подтвердите пароль"
                 className="bg-zinc-800/50 border-zinc-700 text-white placeholder:text-zinc-400"
                 required
+                minLength={6}
+                disabled={isLoading}
               />
             </div>
 
@@ -132,9 +181,19 @@ export default function Register() {
               type="submit"
               className="w-full bg-gradient-to-r from-yellow-400 to-yellow-600 text-black hover:from-yellow-500 hover:to-yellow-700 font-semibold"
               size="lg"
+              disabled={isLoading}
             >
-              <Icon name="UserPlus" size={20} className="mr-2" />
-              Создать аккаунт
+              {isLoading ? (
+                <>
+                  <Icon name="Loader2" size={20} className="mr-2 animate-spin" />
+                  Регистрация...
+                </>
+              ) : (
+                <>
+                  <Icon name="UserPlus" size={20} className="mr-2" />
+                  Создать аккаунт
+                </>
+              )}
             </Button>
           </form>
 

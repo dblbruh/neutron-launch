@@ -11,6 +11,8 @@ import {
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import Icon from "@/components/ui/icon";
+import { useAuth } from "@/context/AuthContext";
+import { useNavigate } from "react-router-dom";
 import funcUrls from "../../backend/func2url.json";
 
 interface UserProfile {
@@ -42,16 +44,21 @@ interface MatchHistory {
 const matchHistory: MatchHistory[] = [];
 
 export default function Profile() {
+  const { user, isAuthenticated } = useAuth();
+  const navigate = useNavigate();
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    if (!isAuthenticated || !user) {
+      navigate('/login');
+      return;
+    }
+
     const loadProfile = async () => {
-      const userId = 1;
-      
       const profileUrl = funcUrls.profile as string;
-      const response = await fetch(`${profileUrl}?user_id=${userId}`);
+      const response = await fetch(`${profileUrl}?user_id=${user.id}`);
       
       if (!response.ok) {
         setError('Не удалось загрузить профиль');
@@ -65,7 +72,7 @@ export default function Profile() {
     };
 
     loadProfile();
-  }, []);
+  }, [user, isAuthenticated, navigate]);
   if (loading) {
     return (
       <div className="min-h-screen bg-black text-white">
