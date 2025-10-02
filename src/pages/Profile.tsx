@@ -309,7 +309,7 @@ export default function Profile() {
                   <p className="text-zinc-300 text-lg font-medium mb-2">История матчей пуста</p>
                   <p className="text-zinc-500 text-sm">Сыграйте свой первый матч, чтобы увидеть статистику</p>
                   <Button 
-                    onClick={() => navigate('/matchmaking')}
+                    onClick={() => navigate('/play')}
                     className="mt-6 bg-gradient-to-r from-yellow-400 to-yellow-600 text-black hover:from-yellow-300 hover:to-yellow-500"
                   >
                     <Icon name="Swords" size={20} className="mr-2" />
