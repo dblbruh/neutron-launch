@@ -1,0 +1,33 @@
+{
+  "tests": [
+    {
+      "name": "List available servers",
+      "method": "GET",
+      "path": "/?action=list",
+      "expectedStatus": 200,
+      "expectedBody": {
+        "servers": "array",
+        "available": "array"
+      },
+      "bodyMatcher": "partial"
+    },
+    {
+      "name": "Start match on server",
+      "method": "POST",
+      "path": "/",
+      "body": {
+        "action": "start_match",
+        "match_id": "test_match_001",
+        "game_mode": "competitive",
+        "team1_players": ["player1", "player2"],
+        "team2_players": ["player3", "player4"]
+      },
+      "expectedStatus": 200,
+      "expectedBody": {
+        "success": "boolean",
+        "match_id": "string"
+      },
+      "bodyMatcher": "partial"
+    }
+  ]
+}
