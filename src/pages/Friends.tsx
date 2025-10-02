@@ -61,6 +61,11 @@ export default function Friends() {
     loadFriends();
     loadFriendRequests();
     
+    const tab = searchParams.get('tab');
+    if (tab === 'requests') {
+      setActiveTab('requests');
+    }
+    
     const chatId = searchParams.get('chat');
     if (chatId) {
       const friendId = parseInt(chatId);

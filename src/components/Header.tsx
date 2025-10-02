@@ -1,5 +1,6 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import Icon from "@/components/ui/icon";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
@@ -10,15 +11,39 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import UserSearch from "@/components/UserSearch";
+import funcUrls from "../../backend/func2url.json";
 
 export default function Header() {
   const { user, isAuthenticated, logout } = useAuth();
   const navigate = useNavigate();
   const [showSearch, setShowSearch] = useState(false);
+  const [friendRequestsCount, setFriendRequestsCount] = useState(0);
 
   const handleLogout = () => {
     logout();
     navigate('/');
+  };
+
+  useEffect(() => {
+    if (isAuthenticated && user) {
+      loadFriendRequestsCount();
+      const interval = setInterval(loadFriendRequestsCount, 30000);
+      return () => clearInterval(interval);
+    }
+  }, [isAuthenticated, user]);
+
+  const loadFriendRequestsCount = async () => {
+    if (!user) return;
+    
+    try {
+      const response = await fetch(`${funcUrls.content}?resource=friends&user_id=${user.id}&requests=true`);
+      if (response.ok) {
+        const data = await response.json();
+        setFriendRequestsCount(data.length);
+      }
+    } catch (error) {
+      console.error('Failed to load friend requests count:', error);
+    }
   };
 
   return (
@@ -88,6 +113,34 @@ export default function Header() {
             >
               <Icon name="Search" size={18} />
             </Button>
+            
+            {isAuthenticated && user ? (
+              <>
+                <Link to="/friends?tab=requests">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="text-zinc-400 hover:text-white relative"
+                  >
+                    <Icon name="UserPlus" size={18} />
+                    {friendRequestsCount > 0 && (
+                      <Badge className="absolute -top-1 -right-1 h-5 w-5 p-0 flex items-center justify-center bg-red-500 text-white text-xs">
+                        {friendRequestsCount > 9 ? '9+' : friendRequestsCount}
+                      </Badge>
+                    )}
+                  </Button>
+                </Link>
+                <Link to="/friends">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="text-zinc-400 hover:text-white"
+                  >
+                    <Icon name="Users" size={18} />
+                  </Button>
+                </Link>
+              </>
+            ) : null}
             
             {isAuthenticated && user ? (
               // Если пользователь авторизован
