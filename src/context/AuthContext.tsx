@@ -9,6 +9,7 @@ interface User {
   level: number;
   wins?: number;
   losses?: number;
+  isAdmin?: boolean;
 }
 
 interface AuthContextType {

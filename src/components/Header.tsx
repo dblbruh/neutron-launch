@@ -78,6 +78,18 @@ export default function Header() {
                   <Icon name="Coins" size={16} className="text-yellow-400" />
                   <span className="text-yellow-400 font-semibold">{user.points.toLocaleString()}</span>
                 </div>
+                {user.isAdmin && (
+                  <Link to="/admin">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="border-yellow-600 text-yellow-400 hover:bg-yellow-400/10"
+                    >
+                      <Icon name="Shield" size={16} className="mr-2" />
+                      Админ
+                    </Button>
+                  </Link>
+                )}
                 <Link to="/profile">
                   <Button
                     variant="outline"

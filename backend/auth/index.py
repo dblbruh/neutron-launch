@@ -140,7 +140,7 @@ def register_user(data: Dict[str, Any], headers: Dict[str, str]) -> Dict[str, An
         cur.execute("""
             INSERT INTO users (username, email, password_hash, display_name, points, level)
             VALUES (%s, %s, %s, %s, %s, %s)
-            RETURNING id, username, email, display_name, points, level, created_at
+            RETURNING id, username, email, display_name, points, level, created_at, is_admin
         """, (username, email, password_hash, display_name, 100, 1))
         
         new_user = cur.fetchone()
@@ -153,7 +153,8 @@ def register_user(data: Dict[str, Any], headers: Dict[str, str]) -> Dict[str, An
             'displayName': new_user[3],
             'points': new_user[4],
             'level': new_user[5],
-            'createdAt': new_user[6].isoformat()
+            'createdAt': new_user[6].isoformat(),
+            'isAdmin': new_user[7] if len(new_user) > 7 else False
         }
         
         cur.close()
@@ -196,7 +197,7 @@ def login_user(data: Dict[str, Any], headers: Dict[str, str]) -> Dict[str, Any]:
         
         # Поиск пользователя по username или email
         cur.execute("""
-            SELECT id, username, email, password_hash, display_name, points, level, wins, losses 
+            SELECT id, username, email, password_hash, display_name, points, level, wins, losses, is_admin 
             FROM users 
             WHERE (username = %s OR email = %s) AND is_active = true
         """, (login, login))
@@ -228,7 +229,8 @@ def login_user(data: Dict[str, Any], headers: Dict[str, str]) -> Dict[str, Any]:
             'points': user[5],
             'level': user[6],
             'wins': user[7],
-            'losses': user[8]
+            'losses': user[8],
+            'isAdmin': user[9] if len(user) > 9 else False
         }
         
         return {
