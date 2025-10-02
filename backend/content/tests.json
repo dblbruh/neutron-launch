@@ -1,0 +1,35 @@
+{
+  "tests": [
+    {
+      "name": "Get tournaments",
+      "method": "GET",
+      "path": "/?resource=tournaments",
+      "expectedStatus": 200,
+      "expectedBody": "array"
+    },
+    {
+      "name": "Get news",
+      "method": "GET",
+      "path": "/?resource=news",
+      "expectedStatus": 200,
+      "expectedBody": "array"
+    },
+    {
+      "name": "Create tournament",
+      "method": "POST",
+      "path": "/?resource=tournaments",
+      "body": {
+        "action": "create",
+        "name": "Test Tournament",
+        "prize_pool": 5000,
+        "max_participants": 8
+      },
+      "expectedStatus": 201,
+      "expectedBody": {
+        "id": "number",
+        "name": "string"
+      },
+      "bodyMatcher": "partial"
+    }
+  ]
+}

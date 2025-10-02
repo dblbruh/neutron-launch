@@ -11,6 +11,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
+import funcUrls from "../../backend/func2url.json";
 
 export default function Admin() {
   const { user, isAuthenticated } = useAuth();
@@ -147,6 +148,7 @@ export default function Admin() {
 
 function TournamentForm() {
   const { toast } = useToast();
+  const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
     prize: "",
@@ -155,13 +157,47 @@ function TournamentForm() {
     format: "single-elimination",
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    toast({
-      title: "Турнир создан!",
-      description: `Турнир "${formData.name}" успешно создан`,
-    });
-    setFormData({ name: "", prize: "", startDate: "", maxTeams: "", format: "single-elimination" });
+    setIsLoading(true);
+
+    try {
+      const response = await fetch(`${funcUrls.content}?resource=tournaments`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'create',
+          name: formData.name,
+          prize_pool: parseInt(formData.prize) || 0,
+          max_participants: parseInt(formData.maxTeams) || 16,
+          start_date: formData.startDate,
+          format: formData.format
+        })
+      });
+
+      if (response.ok) {
+        toast({
+          title: "Турнир создан!",
+          description: `Турнир "${formData.name}" успешно создан`,
+        });
+        setFormData({ name: "", prize: "", startDate: "", maxTeams: "", format: "single-elimination" });
+      } else {
+        const error = await response.json();
+        toast({
+          title: "Ошибка",
+          description: error.error || "Не удалось создать турнир",
+          variant: "destructive"
+        });
+      }
+    } catch (error) {
+      toast({
+        title: "Ошибка сети",
+        description: "Не удалось подключиться к серверу",
+        variant: "destructive"
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -220,9 +256,19 @@ function TournamentForm() {
       <Button
         type="submit"
         className="w-full bg-gradient-to-r from-yellow-400 to-yellow-600 text-black hover:from-yellow-500 hover:to-yellow-700"
+        disabled={isLoading}
       >
-        <Icon name="Plus" size={16} className="mr-2" />
-        Создать турнир
+        {isLoading ? (
+          <>
+            <Icon name="Loader2" size={16} className="mr-2 animate-spin" />
+            Создание...
+          </>
+        ) : (
+          <>
+            <Icon name="Plus" size={16} className="mr-2" />
+            Создать турнир
+          </>
+        )}
       </Button>
     </form>
   );
@@ -230,19 +276,52 @@ function TournamentForm() {
 
 function NewsForm() {
   const { toast } = useToast();
+  const { user } = useAuth();
+  const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
     title: "",
     category: "update",
     content: "",
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    toast({
-      title: "Новость опубликована!",
-      description: `Новость "${formData.title}" успешно опубликована`,
-    });
-    setFormData({ title: "", category: "update", content: "" });
+    setIsLoading(true);
+
+    try {
+      const response = await fetch(`${funcUrls.content}?resource=news`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          title: formData.title,
+          category: formData.category,
+          content: formData.content,
+          author_id: user?.id
+        })
+      });
+
+      if (response.ok) {
+        toast({
+          title: "Новость опубликована!",
+          description: `Новость "${formData.title}" успешно опубликована`,
+        });
+        setFormData({ title: "", category: "update", content: "" });
+      } else {
+        toast({
+          title: "Ошибка",
+          description: "Не удалось опубликовать новость",
+          variant: "destructive"
+        });
+      }
+    } catch (error) {
+      toast({
+        title: "Ошибка сети",
+        description: "Не удалось подключиться к серверу",
+        variant: "destructive"
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -289,9 +368,19 @@ function NewsForm() {
       <Button
         type="submit"
         className="w-full bg-gradient-to-r from-yellow-400 to-yellow-600 text-black hover:from-yellow-500 hover:to-yellow-700"
+        disabled={isLoading}
       >
-        <Icon name="Send" size={16} className="mr-2" />
-        Опубликовать новость
+        {isLoading ? (
+          <>
+            <Icon name="Loader2" size={16} className="mr-2 animate-spin" />
+            Публикация...
+          </>
+        ) : (
+          <>
+            <Icon name="Send" size={16} className="mr-2" />
+            Опубликовать новость
+          </>
+        )}
       </Button>
     </form>
   );
