@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/card";
 import Icon from "@/components/ui/icon";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 interface GameMode {
   id: string;
@@ -37,6 +38,14 @@ const gameModes: GameMode[] = [
     players: "5 vs 5",
     duration: "30-45 мин",
     icon: "Users",
+  },
+  {
+    id: "challenges",
+    name: "Вызовы",
+    description: "Бросьте вызов другим игрокам на деньги",
+    players: "1v1, 2v2, 5v5",
+    duration: "20-40 мин",
+    icon: "Swords",
   },
   {
     id: "tournament",
@@ -139,10 +148,15 @@ const getCurrentRank = (rating: number): RankTier => {
 };
 
 export default function Play() {
+  const navigate = useNavigate();
   const [isMatchmakingOpen, setIsMatchmakingOpen] = useState(false);
   const [selectedGameMode, setSelectedGameMode] = useState("");
 
   const handleFindGame = (mode: GameMode) => {
+    if (mode.id === 'challenges') {
+      navigate('/challenges');
+      return;
+    }
     setSelectedGameMode(mode.name);
     setIsMatchmakingOpen(true);
   };
