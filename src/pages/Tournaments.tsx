@@ -88,9 +88,7 @@ export default function Tournaments() {
             Активные турниры
           </h2>
           <div className="mb-6 text-center">
-            <Badge className="bg-yellow-500/20 text-yellow-400 border-yellow-500/30 text-lg px-4 py-2">
-              Зимний чемпионат 2024
-            </Badge>
+            <Badge className="bg-yellow-500/20 text-yellow-400 border-yellow-500/30 text-lg px-4 py-2">В разработке</Badge>
             <p className="text-zinc-400 mt-2">Турнирная сетка на 32 команды</p>
           </div>
 
