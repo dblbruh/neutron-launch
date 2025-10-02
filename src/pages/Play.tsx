@@ -173,30 +173,30 @@ export default function Play() {
           </p>
         </div>
 
-        <div className="grid lg:grid-cols-3 gap-8 max-w-6xl mx-auto mb-16">
+        <div className="grid grid-cols-4 gap-6 max-w-7xl mx-auto mb-16">
           {gameModes.map((mode) => (
             <Card
               key={mode.id}
               className="bg-zinc-900/50 border-zinc-800 hover:border-yellow-500 transition-colors cursor-pointer"
             >
-              <CardHeader className="text-center">
-                <div className="w-16 h-16 bg-gradient-to-br from-yellow-400/20 to-yellow-600/20 rounded-full flex items-center justify-center mx-auto mb-4">
+              <CardHeader className="text-center pb-4">
+                <div className="w-14 h-14 bg-gradient-to-br from-yellow-400/20 to-yellow-600/20 rounded-full flex items-center justify-center mx-auto mb-3">
                   <Icon
                     name={mode.icon as any}
-                    size={32}
+                    size={28}
                     className="text-yellow-400"
                   />
                 </div>
-                <CardTitle className="text-2xl font-bold text-white mb-2">
+                <CardTitle className="text-xl font-bold text-white mb-2">
                   {mode.name}
                 </CardTitle>
-                <CardDescription className="text-zinc-400">
+                <CardDescription className="text-zinc-400 text-sm">
                   {mode.description}
                 </CardDescription>
               </CardHeader>
 
-              <CardContent>
-                <div className="space-y-3 mb-6">
+              <CardContent className="pt-0">
+                <div className="space-y-2 mb-4 text-sm">
                   <div className="flex justify-between items-center">
                     <span className="text-zinc-400">Игроки:</span>
                     <span className="text-white">{mode.players}</span>
@@ -210,10 +210,10 @@ export default function Play() {
                 <Button
                   onClick={() => handleFindGame(mode)}
                   className="w-full bg-gradient-to-r from-yellow-400 to-yellow-600 text-black hover:from-yellow-500 hover:to-yellow-700"
-                  size="lg"
+                  size="default"
                 >
-                  <Icon name="Play" size={20} className="mr-2" />
-                  Найти игру
+                  <Icon name="Play" size={18} className="mr-2" />
+                  Играть
                 </Button>
               </CardContent>
             </Card>
