@@ -28,14 +28,14 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
         }
     
     bot_token = os.environ.get('TELEGRAM_BOT_TOKEN', '')
-    channel_id = os.environ.get('TELEGRAM_CHANNEL_ID', '')
+    channel_username = os.environ.get('TELEGRAM_CHANNEL_USERNAME', '')
     
-    if not bot_token or not channel_id:
+    if not bot_token or not channel_username:
         return {
             'statusCode': 400,
             'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
             'body': json.dumps({
-                'error': 'Telegram bot token or channel ID not configured',
+                'error': 'Telegram bot token or channel username not configured',
                 'setup_required': True
             })
         }
@@ -46,7 +46,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
     try:
         if method == 'GET':
             # Проверка подключения к каналу
-            channel_info = get_channel_info(bot_token, channel_id)
+            channel_info = get_channel_info(bot_token, channel_username)
             
             if channel_info.get('ok'):
                 return {
@@ -75,7 +75,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             if action == 'sync':
                 # Получить последние посты из канала
                 limit = body_data.get('limit', 10)
-                posts = get_channel_posts(bot_token, channel_id, limit)
+                posts = get_channel_posts(bot_token, channel_username, limit)
                 
                 if not posts:
                     return {
@@ -149,7 +149,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 if not message_id:
                     return error_response('message_id required', 400)
                 
-                post = get_single_post(bot_token, channel_id, message_id)
+                post = get_single_post(bot_token, channel_username, message_id)
                 
                 if not post:
                     return error_response('Post not found', 404)
