@@ -1,3 +1,4 @@
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -5,9 +6,71 @@ import Icon from "@/components/ui/icon";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { useAuth } from "@/context/AuthContext";
+import funcUrls from "../../backend/func2url.json";
+
+interface Stats {
+  totalUsers: number;
+  onlineUsers: number;
+  totalTournamentsAndChallenges: number;
+  totalPrizePool: number;
+}
 
 export default function Index() {
   const { isAuthenticated } = useAuth();
+  const [stats, setStats] = useState<Stats>({
+    totalUsers: 0,
+    onlineUsers: 0,
+    totalTournamentsAndChallenges: 0,
+    totalPrizePool: 0,
+  });
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    loadStats();
+  }, []);
+
+  const loadStats = async () => {
+    try {
+      const response = await fetch(`${funcUrls.content}?resource=stats`);
+      if (response.ok) {
+        const data = await response.json();
+        setStats(data);
+      }
+    } catch (error) {
+      console.error('Failed to load stats:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const formatNumber = (num: number) => {
+    if (num >= 1000000) return `${(num / 1000000).toFixed(1)}M`;
+    if (num >= 1000) return `${(num / 1000).toFixed(1)}K`;
+    return num.toString();
+  };
+
+  const statsDisplay = [
+    { 
+      value: loading ? "..." : formatNumber(stats.totalUsers), 
+      label: "Зарегистрировано игроков", 
+      icon: "Users" 
+    },
+    { 
+      value: loading ? "..." : stats.onlineUsers.toString(), 
+      label: "Игроков онлайн", 
+      icon: "Activity" 
+    },
+    { 
+      value: loading ? "..." : stats.totalTournamentsAndChallenges.toString(), 
+      label: "Турниров и вызовов проведено", 
+      icon: "Trophy" 
+    },
+    { 
+      value: loading ? "..." : `₽${formatNumber(stats.totalPrizePool)}`, 
+      label: "Выплачено призов", 
+      icon: "Coins" 
+    }
+  ];
 
   const features = [
     {
@@ -38,13 +101,6 @@ export default function Index() {
       link: "/friends",
       color: "from-green-500 to-emerald-500"
     }
-  ];
-
-  const stats = [
-    { value: "10K+", label: "Активных игроков", icon: "Users" },
-    { value: "500+", label: "Турниров проведено", icon: "Trophy" },
-    { value: "₽1M+", label: "Выплачено призов", icon: "Coins" },
-    { value: "24/7", label: "Онлайн поддержка", icon: "Headphones" }
   ];
 
   return (
@@ -114,7 +170,7 @@ export default function Index() {
       <section className="py-16 bg-zinc-950/50">
         <div className="container mx-auto px-4">
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-8">
-            {stats.map((stat, index) => (
+            {statsDisplay.map((stat, index) => (
               <div key={index} className="text-center space-y-2">
                 <Icon name={stat.icon} size={32} className="mx-auto text-yellow-400 mb-3" />
                 <div className="text-3xl lg:text-4xl font-bold bg-gradient-to-r from-yellow-400 to-yellow-600 bg-clip-text text-transparent">

@@ -53,6 +53,8 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             return handle_chat(event, method, database_url, cors_headers)
         elif resource == 'user':
             return handle_user(event, method, database_url, cors_headers)
+        elif resource == 'stats':
+            return handle_stats(event, method, database_url, cors_headers)
         else:
             return {
                 'statusCode': 400,
@@ -473,6 +475,51 @@ def handle_challenges(event, method, database_url, headers):
     
     return {
         'statusCode': 200 if method == 'GET' else 201,
+        'headers': headers,
+        'body': json.dumps(result)
+    }
+
+def handle_stats(event, method, database_url, headers):
+    if method != 'GET':
+        return {
+            'statusCode': 405,
+            'headers': headers,
+            'body': json.dumps({'error': 'Method not allowed'})
+        }
+    
+    conn = psycopg2.connect(database_url)
+    cur = conn.cursor()
+    
+    cur.execute("SELECT COUNT(*) FROM users WHERE is_active = true")
+    total_users = cur.fetchone()[0]
+    
+    cur.execute("SELECT COUNT(DISTINCT user_id) FROM friends WHERE status = 'accepted' AND created_at > NOW() - INTERVAL '5 minutes'")
+    online_users = cur.fetchone()[0]
+    
+    cur.execute("SELECT COUNT(*) FROM tournaments WHERE status IN ('completed', 'live')")
+    total_tournaments = cur.fetchone()[0]
+    
+    cur.execute("SELECT COUNT(*) FROM challenges WHERE status IN ('accepted', 'completed')")
+    total_challenges = cur.fetchone()[0]
+    
+    cur.execute("SELECT COALESCE(SUM(prize_pool), 0) FROM tournaments WHERE status = 'completed'")
+    tournament_prizes = cur.fetchone()[0]
+    
+    cur.execute("SELECT COALESCE(SUM(stake * 2), 0) FROM challenges WHERE status = 'completed'")
+    challenge_prizes = cur.fetchone()[0]
+    
+    cur.close()
+    conn.close()
+    
+    result = {
+        'totalUsers': total_users,
+        'onlineUsers': online_users,
+        'totalTournamentsAndChallenges': total_tournaments + total_challenges,
+        'totalPrizePool': int(tournament_prizes + challenge_prizes)
+    }
+    
+    return {
+        'statusCode': 200,
         'headers': headers,
         'body': json.dumps(result)
     }
