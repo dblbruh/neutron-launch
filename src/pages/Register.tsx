@@ -3,12 +3,17 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+} from "@/components/ui/command";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import {
   Card,
   CardContent,
@@ -20,33 +25,95 @@ import Icon from "@/components/ui/icon";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
 import { useToast } from "@/hooks/use-toast";
+import { cn } from "@/lib/utils";
 import func2url from "../../backend/func2url.json";
 
 const RUSSIAN_REGIONS = [
-  "Москва",
-  "Санкт-Петербург",
-  "Московская область",
-  "Ленинградская область",
-  "Новосибирская область",
-  "Свердловская область",
-  "Нижегородская область",
-  "Казань",
-  "Челябинская область",
-  "Омская область",
-  "Самарская область",
-  "Ростовская область",
-  "Уфа",
-  "Красноярский край",
-  "Воронежская область",
-  "Пермский край",
-  "Волгоградская область",
-  "Краснодарский край",
-  "Саратовская область",
-  "Тюменская область",
-  "Республика Татарстан",
+  "Республика Адыгея",
+  "Республика Алтай",
+  "Алтайский край",
+  "Амурская область",
+  "Архангельская область",
+  "Астраханская область",
   "Республика Башкортостан",
-  "Другой регион"
-];
+  "Белгородская область",
+  "Брянская область",
+  "Республика Бурятия",
+  "Владимирская область",
+  "Волгоградская область",
+  "Вологодская область",
+  "Воронежская область",
+  "Республика Дагестан",
+  "Еврейская автономная область",
+  "Забайкальский край",
+  "Ивановская область",
+  "Республика Ингушетия",
+  "Иркутская область",
+  "Кабардино-Балкарская Республика",
+  "Калининградская область",
+  "Республика Калмыкия",
+  "Калужская область",
+  "Камчатский край",
+  "Карачаево-Черкесская Республика",
+  "Республика Карелия",
+  "Кемеровская область",
+  "Кировская область",
+  "Республика Коми",
+  "Костромская область",
+  "Краснодарский край",
+  "Красноярский край",
+  "Курганская область",
+  "Курская область",
+  "Ленинградская область",
+  "Липецкая область",
+  "Магаданская область",
+  "Республика Марий Эл",
+  "Республика Мордовия",
+  "Москва",
+  "Московская область",
+  "Мурманская область",
+  "Ненецкий автономный округ",
+  "Нижегородская область",
+  "Новгородская область",
+  "Новосибирская область",
+  "Омская область",
+  "Оренбургская область",
+  "Орловская область",
+  "Пензенская область",
+  "Пермский край",
+  "Приморский край",
+  "Псковская область",
+  "Ростовская область",
+  "Рязанская область",
+  "Самарская область",
+  "Санкт-Петербург",
+  "Саратовская область",
+  "Республика Саха (Якутия)",
+  "Сахалинская область",
+  "Свердловская область",
+  "Республика Северная Осетия",
+  "Смоленская область",
+  "Ставропольский край",
+  "Тамбовская область",
+  "Республика Татарстан",
+  "Тверская область",
+  "Томская область",
+  "Тульская область",
+  "Республика Тыва",
+  "Тюменская область",
+  "Удмуртская Республика",
+  "Ульяновская область",
+  "Хабаровский край",
+  "Ханты-Мансийский автономный округ",
+  "Челябинская область",
+  "Чеченская Республика",
+  "Чувашская Республика",
+  "Чукотский автономный округ",
+  "Ямало-Ненецкий автономный округ",
+  "Ярославская область",
+  "Республика Крым",
+  "Севастополь",
+].sort();
 
 export default function Register() {
   const navigate = useNavigate();
@@ -54,6 +121,7 @@ export default function Register() {
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
   const [step, setStep] = useState(1);
+  const [openRegion, setOpenRegion] = useState(false);
   const [formData, setFormData] = useState({
     username: "",
     email: "",
@@ -296,22 +364,56 @@ export default function Register() {
                 <Label htmlFor="region" className="text-zinc-300">
                   Регион проживания *
                 </Label>
-                <Select
-                  value={formData.region}
-                  onValueChange={(value) => setFormData({ ...formData, region: value })}
-                  disabled={isLoading}
-                >
-                  <SelectTrigger className="bg-zinc-800/50 border-zinc-700 text-white">
-                    <SelectValue placeholder="Выберите регион" />
-                  </SelectTrigger>
-                  <SelectContent className="bg-zinc-800 border-zinc-700 text-white max-h-[300px]">
-                    {RUSSIAN_REGIONS.map((region) => (
-                      <SelectItem key={region} value={region} className="focus:bg-zinc-700">
-                        {region}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                <Popover open={openRegion} onOpenChange={setOpenRegion}>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="outline"
+                      role="combobox"
+                      aria-expanded={openRegion}
+                      className={cn(
+                        "w-full justify-between bg-zinc-800/50 border-zinc-700 text-white hover:bg-zinc-800 hover:text-white",
+                        !formData.region && "text-zinc-400"
+                      )}
+                    >
+                      {formData.region || "Выберите регион..."}
+                      <Icon name="ChevronsUpDown" size={16} className="ml-2 opacity-50" />
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-[var(--radix-popover-trigger-width)] p-0 bg-zinc-900 border-zinc-800">
+                    <Command className="bg-zinc-900 border-0">
+                      <CommandInput 
+                        placeholder="Поиск региона..." 
+                        className="h-9 text-white border-0 focus:ring-0"
+                      />
+                      <CommandEmpty className="text-zinc-400 py-6 text-center text-sm">
+                        Регион не найден
+                      </CommandEmpty>
+                      <CommandGroup className="max-h-[300px] overflow-auto">
+                        {RUSSIAN_REGIONS.map((region) => (
+                          <CommandItem
+                            key={region}
+                            value={region}
+                            onSelect={() => {
+                              setFormData({ ...formData, region });
+                              setOpenRegion(false);
+                            }}
+                            className="text-white hover:bg-zinc-800 aria-selected:bg-yellow-400/10"
+                          >
+                            <Icon
+                              name="Check"
+                              size={16}
+                              className={cn(
+                                "mr-2",
+                                formData.region === region ? "opacity-100" : "opacity-0"
+                              )}
+                            />
+                            {region}
+                          </CommandItem>
+                        ))}
+                      </CommandGroup>
+                    </Command>
+                  </PopoverContent>
+                </Popover>
                 <p className="text-xs text-zinc-500">⚠️ Нельзя будет изменить после регистрации</p>
               </div>
 
