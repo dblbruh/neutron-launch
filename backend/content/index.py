@@ -336,7 +336,6 @@ def handle_challenges(event, method, database_url, headers):
     conn = psycopg2.connect(database_url)
     cur = conn.cursor()
     
-    # Создаем таблицу если не существует
     cur.execute("""
         CREATE TABLE IF NOT EXISTS challenges (
             id SERIAL PRIMARY KEY,
@@ -353,17 +352,42 @@ def handle_challenges(event, method, database_url, headers):
     
     if method == 'GET':
         params = event.get('queryStringParameters') or {}
-        status = params.get('status', 'open')
+        user_id = params.get('user_id')
+        status = params.get('status')
         
-        cur.execute("""
-            SELECT c.*, u1.username as creator_name, u2.username as opponent_name
-            FROM challenges c
-            LEFT JOIN users u1 ON c.creator_id = u1.id
-            LEFT JOIN users u2 ON c.opponent_id = u2.id
-            WHERE c.status = %s
-            ORDER BY c.created_at DESC
-            LIMIT 50
-        """, (status,))
+        if user_id and not status:
+            cur.execute("""
+                SELECT c.*, u1.username as creator_name, u1.display_name as creator_display_name,
+                       u2.username as opponent_name, u2.display_name as opponent_display_name
+                FROM challenges c
+                LEFT JOIN users u1 ON c.creator_id = u1.id
+                LEFT JOIN users u2 ON c.opponent_id = u2.id
+                WHERE c.creator_id = %s
+                ORDER BY c.created_at DESC
+                LIMIT 50
+            """, (user_id,))
+        elif status:
+            cur.execute("""
+                SELECT c.*, u1.username as creator_name, u1.display_name as creator_display_name,
+                       u2.username as opponent_name, u2.display_name as opponent_display_name
+                FROM challenges c
+                LEFT JOIN users u1 ON c.creator_id = u1.id
+                LEFT JOIN users u2 ON c.opponent_id = u2.id
+                WHERE c.status = %s
+                ORDER BY c.created_at DESC
+                LIMIT 50
+            """, (status,))
+        else:
+            cur.execute("""
+                SELECT c.*, u1.username as creator_name, u1.display_name as creator_display_name,
+                       u2.username as opponent_name, u2.display_name as opponent_display_name
+                FROM challenges c
+                LEFT JOIN users u1 ON c.creator_id = u1.id
+                LEFT JOIN users u2 ON c.opponent_id = u2.id
+                WHERE c.status = 'open'
+                ORDER BY c.created_at DESC
+                LIMIT 50
+            """)
         
         challenges = cur.fetchall()
         result = [
@@ -371,15 +395,18 @@ def handle_challenges(event, method, database_url, headers):
                 'id': ch[0],
                 'creator': {
                     'id': ch[1],
-                    'username': ch[8]
+                    'username': ch[8],
+                    'displayName': ch[9]
                 },
                 'opponent': {
                     'id': ch[2],
-                    'username': ch[9]
+                    'username': ch[10],
+                    'displayName': ch[11]
                 } if ch[2] else None,
                 'game_mode': ch[3],
                 'stake': ch[4],
                 'status': ch[5],
+                'reward': int(ch[4] * 1.8) if ch[4] else 0,
                 'created_at': ch[7].isoformat() if ch[7] else None
             }
             for ch in challenges
@@ -408,19 +435,36 @@ def handle_challenges(event, method, database_url, headers):
                 'creator_id': challenge[1],
                 'game_mode': challenge[2],
                 'stake': challenge[3],
-                'status': 'open'
+                'status': 'open',
+                'reward': int(challenge[3] * 1.8)
             }
             
         elif action == 'accept':
             cur.execute("""
                 UPDATE challenges 
                 SET opponent_id = %s, status = 'accepted'
-                WHERE id = %s
+                WHERE id = %s AND status = 'open'
                 RETURNING id
             """, (body.get('user_id'), body.get('challenge_id')))
             
-            conn.commit()
-            result = {'message': 'Challenge accepted'}
+            if cur.rowcount > 0:
+                conn.commit()
+                result = {'message': 'Challenge accepted'}
+            else:
+                result = {'error': 'Challenge not available'}
+                
+        elif action == 'cancel':
+            cur.execute("""
+                DELETE FROM challenges 
+                WHERE id = %s AND creator_id = %s AND status = 'open'
+                RETURNING id
+            """, (body.get('challenge_id'), body.get('user_id')))
+            
+            if cur.rowcount > 0:
+                conn.commit()
+                result = {'message': 'Challenge cancelled'}
+            else:
+                result = {'error': 'Cannot cancel this challenge'}
     else:
         result = {'error': 'Method not allowed'}
     
