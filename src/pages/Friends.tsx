@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import Icon from "@/components/ui/icon";
 import { useAuth } from "@/context/AuthContext";
 import { useToast } from "@/hooks/use-toast";
@@ -18,6 +19,16 @@ interface Friend {
   points: number;
   level: number;
   status: string;
+}
+
+interface FriendRequest {
+  id: number;
+  username: string;
+  displayName: string;
+  points: number;
+  level: number;
+  request_id: number;
+  created_at: string;
 }
 
 interface Message {
@@ -35,17 +46,20 @@ export default function Friends() {
   const { toast } = useToast();
   const [searchParams, setSearchParams] = useSearchParams();
   const [friends, setFriends] = useState<Friend[]>([]);
+  const [friendRequests, setFriendRequests] = useState<FriendRequest[]>([]);
   const [selectedFriend, setSelectedFriend] = useState<Friend | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
   const [loading, setLoading] = useState(true);
+  const [activeTab, setActiveTab] = useState("friends");
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (!isAuthenticated || !user) return;
 
     loadFriends();
+    loadFriendRequests();
     
     const chatId = searchParams.get('chat');
     if (chatId) {
@@ -91,6 +105,74 @@ export default function Friends() {
     }
   };
 
+  const loadFriendRequests = async () => {
+    if (!user) return;
+    
+    try {
+      const response = await fetch(`${funcUrls.content}?resource=friends&user_id=${user.id}&requests=true`);
+      if (response.ok) {
+        const data = await response.json();
+        setFriendRequests(data);
+      }
+    } catch (error) {
+      console.error('Failed to load requests:', error);
+    }
+  };
+
+  const handleAcceptRequest = async (requestId: number, friendName: string) => {
+    try {
+      const response = await fetch(`${funcUrls.content}?resource=friends`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'accept',
+          request_id: requestId
+        })
+      });
+
+      if (response.ok) {
+        toast({
+          title: "Заявка принята",
+          description: `${friendName} теперь ваш друг`
+        });
+        loadFriends();
+        loadFriendRequests();
+      }
+    } catch (error) {
+      toast({
+        title: "Ошибка",
+        description: "Не удалось принять заявку",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const handleRejectRequest = async (requestId: number) => {
+    try {
+      const response = await fetch(`${funcUrls.content}?resource=friends`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'reject',
+          request_id: requestId
+        })
+      });
+
+      if (response.ok) {
+        toast({
+          title: "Заявка отклонена"
+        });
+        loadFriendRequests();
+      }
+    } catch (error) {
+      toast({
+        title: "Ошибка",
+        description: "Не удалось отклонить заявку",
+        variant: "destructive"
+      });
+    }
+  };
+
   const loadMessages = async (friendId: number) => {
     if (!user) return;
     
@@ -125,16 +207,10 @@ export default function Friends() {
       if (response.ok) {
         setNewMessage("");
         loadMessages(selectedFriend.id);
-      } else {
-        toast({
-          title: "Ошибка",
-          description: "Не удалось отправить сообщение",
-          variant: "destructive"
-        });
       }
     } catch (error) {
       toast({
-        title: "Ошибка сети",
+        title: "Ошибка",
         description: "Не удалось отправить сообщение",
         variant: "destructive"
       });
@@ -144,6 +220,7 @@ export default function Friends() {
   const openChat = (friend: Friend) => {
     setSelectedFriend(friend);
     setSearchParams({ chat: friend.id.toString() });
+    setActiveTab("friends");
     loadMessages(friend.id);
   };
 
@@ -170,68 +247,136 @@ export default function Friends() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 h-[calc(100vh-200px)]">
           <Card className="bg-zinc-900/50 border-zinc-800 flex flex-col">
             <CardHeader>
-              <CardTitle className="flex items-center justify-between text-white">
-                <span>Друзья ({friends.length})</span>
-                <Button size="sm" variant="outline" className="border-zinc-700">
-                  <Icon name="UserPlus" size={16} />
-                </Button>
-              </CardTitle>
-              <Input
-                placeholder="Поиск друзей..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="bg-zinc-800/50 border-zinc-700 mt-4"
-              />
+              <CardTitle className="text-white">Социальная сеть</CardTitle>
             </CardHeader>
-            <CardContent className="flex-1 overflow-y-auto">
-              {loading ? (
-                <div className="flex justify-center py-8">
-                  <Icon name="Loader2" size={32} className="animate-spin text-yellow-400" />
-                </div>
-              ) : friends.length === 0 ? (
-                <div className="text-center py-8 text-zinc-400">
-                  <Icon name="Users" size={48} className="mx-auto mb-4 text-zinc-600" />
-                  <p>У вас пока нет друзей</p>
-                  <p className="text-sm mt-2">Добавьте друзей через поиск пользователей</p>
-                </div>
-              ) : (
-                <div className="space-y-2">
-                  {friends
-                    .filter(f => 
-                      f.username.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                      f.displayName.toLowerCase().includes(searchQuery.toLowerCase())
-                    )
-                    .map((friend) => (
-                      <div
-                        key={friend.id}
-                        onClick={() => openChat(friend)}
-                        className={`p-3 rounded-lg cursor-pointer transition-colors ${
-                          selectedFriend?.id === friend.id
-                            ? 'bg-yellow-400/10 border border-yellow-600'
-                            : 'bg-zinc-800/50 hover:bg-zinc-800 border border-transparent'
-                        }`}
-                      >
-                        <div className="flex items-center space-x-3">
-                          <div className="relative">
-                            <div className="w-10 h-10 bg-gradient-to-br from-yellow-400 to-yellow-600 rounded-full flex items-center justify-center font-bold text-black">
-                              {friend.displayName[0].toUpperCase()}
+            <CardContent className="flex-1 overflow-hidden flex flex-col">
+              <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1 flex flex-col">
+                <TabsList className="bg-zinc-800 mb-4">
+                  <TabsTrigger value="friends" className="data-[state=active]:bg-yellow-400/10">
+                    <Icon name="Users" size={16} className="mr-2" />
+                    Друзья ({friends.length})
+                  </TabsTrigger>
+                  <TabsTrigger value="requests" className="data-[state=active]:bg-yellow-400/10">
+                    <Icon name="UserPlus" size={16} className="mr-2" />
+                    Заявки
+                    {friendRequests.length > 0 && (
+                      <Badge className="ml-2 bg-red-500 text-white">{friendRequests.length}</Badge>
+                    )}
+                  </TabsTrigger>
+                </TabsList>
+
+                <TabsContent value="friends" className="flex-1 overflow-y-auto mt-0">
+                  <Input
+                    placeholder="Поиск друзей..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="bg-zinc-800/50 border-zinc-700 mb-4"
+                  />
+                  
+                  {loading ? (
+                    <div className="flex justify-center py-8">
+                      <Icon name="Loader2" size={32} className="animate-spin text-yellow-400" />
+                    </div>
+                  ) : friends.length === 0 ? (
+                    <div className="text-center py-8 text-zinc-400">
+                      <Icon name="Users" size={48} className="mx-auto mb-4 text-zinc-600" />
+                      <p>У вас пока нет друзей</p>
+                      <p className="text-sm mt-2">Найдите игроков через поиск</p>
+                    </div>
+                  ) : (
+                    <div className="space-y-2">
+                      {friends
+                        .filter(f => 
+                          f.username.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                          f.displayName.toLowerCase().includes(searchQuery.toLowerCase())
+                        )
+                        .map((friend) => (
+                          <div
+                            key={friend.id}
+                            onClick={() => openChat(friend)}
+                            className={`p-3 rounded-lg cursor-pointer transition-colors ${
+                              selectedFriend?.id === friend.id
+                                ? 'bg-yellow-400/10 border border-yellow-600'
+                                : 'bg-zinc-800/50 hover:bg-zinc-800 border border-transparent'
+                            }`}
+                          >
+                            <div className="flex items-center space-x-3">
+                              <div className="relative">
+                                <div className="w-10 h-10 bg-gradient-to-br from-yellow-400 to-yellow-600 rounded-full flex items-center justify-center font-bold text-black">
+                                  {friend.displayName[0].toUpperCase()}
+                                </div>
+                                <div className={`absolute bottom-0 right-0 w-3 h-3 rounded-full border-2 border-zinc-900 ${
+                                  friend.status === 'online' ? 'bg-green-500' : 'bg-zinc-500'
+                                }`} />
+                              </div>
+                              <div className="flex-1 min-w-0">
+                                <p className="font-semibold text-white truncate">{friend.displayName}</p>
+                                <p className="text-xs text-zinc-400 truncate">@{friend.username}</p>
+                              </div>
+                              <Badge variant="outline" className="border-zinc-700 text-zinc-400">
+                                Ур. {friend.level}
+                              </Badge>
                             </div>
-                            <div className={`absolute bottom-0 right-0 w-3 h-3 rounded-full border-2 border-zinc-900 ${
-                              friend.status === 'online' ? 'bg-green-500' : 'bg-zinc-500'
-                            }`} />
                           </div>
-                          <div className="flex-1 min-w-0">
-                            <p className="font-semibold text-white truncate">{friend.displayName}</p>
-                            <p className="text-xs text-zinc-400 truncate">@{friend.username}</p>
+                        ))}
+                    </div>
+                  )}
+                </TabsContent>
+
+                <TabsContent value="requests" className="flex-1 overflow-y-auto mt-0">
+                  {friendRequests.length === 0 ? (
+                    <div className="text-center py-8 text-zinc-400">
+                      <Icon name="Inbox" size={48} className="mx-auto mb-4 text-zinc-600" />
+                      <p>Нет новых заявок</p>
+                    </div>
+                  ) : (
+                    <div className="space-y-3">
+                      {friendRequests.map((request) => (
+                        <div key={request.request_id} className="p-4 rounded-lg bg-zinc-800/50 border border-zinc-700">
+                          <div className="flex items-start justify-between mb-3">
+                            <div className="flex items-center space-x-3 flex-1">
+                              <div className="w-12 h-12 bg-gradient-to-br from-yellow-400 to-yellow-600 rounded-full flex items-center justify-center font-bold text-black">
+                                {request.displayName[0].toUpperCase()}
+                              </div>
+                              <div>
+                                <Link 
+                                  to={`/user/${request.username}`}
+                                  className="font-semibold text-white hover:text-yellow-400"
+                                >
+                                  {request.displayName}
+                                </Link>
+                                <p className="text-xs text-zinc-400">@{request.username}</p>
+                                <p className="text-xs text-zinc-500 mt-1">
+                                  {new Date(request.created_at).toLocaleDateString('ru-RU')}
+                                </p>
+                              </div>
+                            </div>
                           </div>
-                          <Badge variant="outline" className="border-zinc-700 text-zinc-400">
-                            Ур. {friend.level}
-                          </Badge>
+                          <div className="flex gap-2">
+                            <Button
+                              size="sm"
+                              onClick={() => handleAcceptRequest(request.request_id, request.displayName)}
+                              className="flex-1 bg-green-600 hover:bg-green-700"
+                            >
+                              <Icon name="Check" size={16} className="mr-1" />
+                              Принять
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() => handleRejectRequest(request.request_id)}
+                              className="flex-1 border-zinc-700 hover:bg-red-900/20"
+                            >
+                              <Icon name="X" size={16} className="mr-1" />
+                              Отклонить
+                            </Button>
+                          </div>
                         </div>
-                      </div>
-                    ))}
-                </div>
-              )}
+                      ))}
+                    </div>
+                  )}
+                </TabsContent>
+              </Tabs>
             </CardContent>
           </Card>
 

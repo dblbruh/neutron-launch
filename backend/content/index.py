@@ -254,35 +254,44 @@ def handle_friends(event, method, database_url, headers):
     if method == 'GET':
         params = event.get('queryStringParameters') or {}
         user_id = params.get('user_id')
+        get_requests = params.get('requests') == 'true'
         
         if not user_id:
             cur.close()
             conn.close()
-            return {
-                'statusCode': 400,
-                'headers': headers,
-                'body': json.dumps({'error': 'user_id required'})
-            }
+            return {'statusCode': 400, 'headers': headers, 'body': json.dumps({'error': 'user_id required'})}
         
-        cur.execute("""
-            SELECT u.id, u.username, u.display_name, u.points, u.level, f.status
-            FROM friends f
-            JOIN users u ON (f.friend_id = u.id OR f.user_id = u.id)
-            WHERE (f.user_id = %s OR f.friend_id = %s) AND u.id != %s AND f.status = 'accepted'
-        """, (user_id, user_id, user_id))
-        
-        friends = cur.fetchall()
-        result = [
-            {
-                'id': f[0],
-                'username': f[1],
-                'displayName': f[2],
-                'points': f[3],
-                'level': f[4],
+        if get_requests:
+            # Получить входящие заявки
+            cur.execute("""
+                SELECT u.id, u.username, u.display_name, u.points, u.level, f.id as request_id, f.created_at
+                FROM friends f
+                JOIN users u ON f.user_id = u.id
+                WHERE f.friend_id = %s AND f.status = 'pending'
+                ORDER BY f.created_at DESC
+            """, (user_id,))
+            
+            requests = cur.fetchall()
+            result = [{
+                'id': r[0], 'username': r[1], 'displayName': r[2],
+                'points': r[3], 'level': r[4], 'request_id': r[5],
+                'created_at': r[6].isoformat() if r[6] else None
+            } for r in requests]
+        else:
+            # Получить друзей
+            cur.execute("""
+                SELECT u.id, u.username, u.display_name, u.points, u.level, f.status
+                FROM friends f
+                JOIN users u ON (f.friend_id = u.id OR f.user_id = u.id)
+                WHERE (f.user_id = %s OR f.friend_id = %s) AND u.id != %s AND f.status = 'accepted'
+            """, (user_id, user_id, user_id))
+            
+            friends = cur.fetchall()
+            result = [{
+                'id': f[0], 'username': f[1], 'displayName': f[2],
+                'points': f[3], 'level': f[4],
                 'status': 'online' if f[0] % 2 == 0 else 'offline'
-            }
-            for f in friends
-        ]
+            } for f in friends]
         
     elif method == 'POST':
         body = json.loads(event.get('body', '{}'))
@@ -304,9 +313,13 @@ def handle_friends(event, method, database_url, headers):
                 WHERE id = %s
                 RETURNING id
             """, (body.get('request_id'),))
-            
             conn.commit()
             result = {'message': 'Friend request accepted'}
+        
+        elif action == 'reject':
+            cur.execute("DELETE FROM friends WHERE id = %s", (body.get('request_id'),))
+            conn.commit()
+            result = {'message': 'Friend request rejected'}
     else:
         result = {'error': 'Method not allowed'}
     
