@@ -49,6 +49,10 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             return handle_friends(event, method, database_url, cors_headers)
         elif resource == 'challenges':
             return handle_challenges(event, method, database_url, cors_headers)
+        elif resource == 'chat':
+            return handle_chat(event, method, database_url, cors_headers)
+        elif resource == 'user':
+            return handle_user(event, method, database_url, cors_headers)
         else:
             return {
                 'statusCode': 400,
@@ -415,3 +419,115 @@ def handle_challenges(event, method, database_url, headers):
         'headers': headers,
         'body': json.dumps(result)
     }
+
+def handle_chat(event, method, database_url, headers):
+    conn = psycopg2.connect(database_url)
+    cur = conn.cursor()
+    
+    cur.execute("""
+        CREATE TABLE IF NOT EXISTS messages (
+            id SERIAL PRIMARY KEY,
+            sender_id INTEGER REFERENCES users(id),
+            receiver_id INTEGER REFERENCES users(id),
+            message TEXT NOT NULL,
+            is_read BOOLEAN DEFAULT FALSE,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+    """)
+    conn.commit()
+    
+    if method == 'GET':
+        params = event.get('queryStringParameters') or {}
+        user_id = params.get('user_id')
+        friend_id = params.get('friend_id')
+        
+        if not user_id:
+            cur.close()
+            conn.close()
+            return {'statusCode': 400, 'headers': headers, 'body': json.dumps({'error': 'user_id required'})}
+        
+        if friend_id:
+            cur.execute("""
+                SELECT m.*, u1.username as sender_username, u2.username as receiver_username
+                FROM messages m
+                LEFT JOIN users u1 ON m.sender_id = u1.id
+                LEFT JOIN users u2 ON m.receiver_id = u2.id
+                WHERE (m.sender_id = %s AND m.receiver_id = %s) OR (m.sender_id = %s AND m.receiver_id = %s)
+                ORDER BY m.created_at ASC LIMIT 100
+            """, (user_id, friend_id, friend_id, user_id))
+            
+            messages = cur.fetchall()
+            result = [{
+                'id': msg[0], 'sender_id': msg[1], 'receiver_id': msg[2],
+                'message': msg[3], 'is_read': msg[4],
+                'created_at': msg[5].isoformat() if msg[5] else None,
+                'sender_username': msg[6], 'receiver_username': msg[7]
+            } for msg in messages]
+        else:
+            result = []
+    
+    elif method == 'POST':
+        body = json.loads(event.get('body', '{}'))
+        cur.execute("""
+            INSERT INTO messages (sender_id, receiver_id, message)
+            VALUES (%s, %s, %s)
+            RETURNING id, sender_id, receiver_id, message, created_at
+        """, (body.get('sender_id'), body.get('receiver_id'), body.get('message')))
+        
+        message = cur.fetchone()
+        conn.commit()
+        result = {'id': message[0], 'sender_id': message[1], 'receiver_id': message[2],
+                  'message': message[3], 'created_at': message[4].isoformat()}
+    else:
+        result = {'error': 'Method not allowed'}
+    
+    cur.close()
+    conn.close()
+    return {'statusCode': 200 if method == 'GET' else 201, 'headers': headers, 'body': json.dumps(result)}
+
+def handle_user(event, method, database_url, headers):
+    conn = psycopg2.connect(database_url)
+    cur = conn.cursor()
+    
+    if method == 'GET':
+        params = event.get('queryStringParameters') or {}
+        username = params.get('username')
+        search = params.get('search')
+        
+        if username:
+            cur.execute("""
+                SELECT id, username, display_name, points, level, wins, losses, created_at
+                FROM users WHERE username = %s AND is_active = true
+            """, (username,))
+            
+            user = cur.fetchone()
+            if not user:
+                cur.close()
+                conn.close()
+                return {'statusCode': 404, 'headers': headers, 'body': json.dumps({'error': 'User not found'})}
+            
+            total = user[5] + user[6]
+            result = {
+                'id': user[0], 'username': user[1], 'displayName': user[2],
+                'points': user[3], 'level': user[4], 'wins': user[5], 'losses': user[6],
+                'winRate': round((user[5] / total * 100) if total > 0 else 0, 1),
+                'totalMatches': total, 'memberSince': user[7].isoformat() if user[7] else None
+            }
+        elif search:
+            cur.execute("""
+                SELECT id, username, display_name, points, level
+                FROM users WHERE (username ILIKE %s OR display_name ILIKE %s) AND is_active = true LIMIT 20
+            """, (f'%{search}%', f'%{search}%'))
+            
+            users = cur.fetchall()
+            result = [{'id': u[0], 'username': u[1], 'displayName': u[2], 'points': u[3], 'level': u[4]} for u in users]
+        else:
+            cur.close()
+            conn.close()
+            return {'statusCode': 400, 'headers': headers, 'body': json.dumps({'error': 'username or search required'})}
+    else:
+        result = {'error': 'Method not allowed'}
+    
+    cur.close()
+    conn.close()
+    return {'statusCode': 200, 'headers': headers, 'body': json.dumps(result)}
