@@ -1,0 +1,29 @@
+{
+  "tests": [
+    {
+      "name": "Check Telegram connection",
+      "method": "GET",
+      "path": "/",
+      "expectedStatus": 200,
+      "expectedBody": {
+        "connected": "boolean"
+      },
+      "bodyMatcher": "partial"
+    },
+    {
+      "name": "Sync posts from Telegram",
+      "method": "POST",
+      "path": "/",
+      "body": {
+        "action": "sync",
+        "limit": 5
+      },
+      "expectedStatus": 200,
+      "expectedBody": {
+        "loaded": "number",
+        "message": "string"
+      },
+      "bodyMatcher": "partial"
+    }
+  ]
+}
