@@ -34,27 +34,9 @@ export default function Leaderboard() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Симуляция загрузки данных
     const loadData = async () => {
-      // В реальном приложении здесь будут API вызовы
-      const mockPlayers: Player[] = [
-        { id: 1, username: "ProGamer2024", displayName: "Pro Gamer", points: 5847, level: 15, wins: 234, losses: 89, winRate: 72.4 },
-        { id: 2, username: "ChampionX", displayName: "Champion X", points: 5241, level: 14, wins: 198, losses: 67, winRate: 74.7 },
-        { id: 3, username: "SkillMaster", displayName: "Skill Master", points: 4923, level: 13, wins: 176, losses: 54, winRate: 76.5 },
-        { id: 4, username: "ElitePlayer", displayName: "Elite Player", points: 4567, level: 12, wins: 165, losses: 78, winRate: 67.9 },
-        { id: 5, username: "GameLord", displayName: "Game Lord", points: 4234, level: 11, wins: 145, losses: 65, winRate: 69.0 },
-        { id: 6, username: "MegaWin", displayName: "Mega Win", points: 3987, level: 10, wins: 134, losses: 71, winRate: 65.4 },
-        { id: 7, username: "TopShooter", displayName: "Top Shooter", points: 3721, level: 9, wins: 128, losses: 83, winRate: 60.7 },
-        { id: 8, username: "UltraGamer", displayName: "Ultra Gamer", points: 3456, level: 8, wins: 119, losses: 91, winRate: 56.7 },
-      ];
-
-      const mockMatches: Match[] = [
-        { id: "1", gameMode: "Классика", player1: "ProGamer2024", player2: "ChampionX", winner: "ProGamer2024", score: "16-14", duration: "25:34", date: "2 мин назад" },
-        { id: "2", gameMode: "Турбо", player1: "SkillMaster", player2: "ElitePlayer", winner: "SkillMaster", score: "16-11", duration: "18:22", date: "8 мин назад" },
-        { id: "3", gameMode: "Классика", player1: "GameLord", player2: "MegaWin", winner: "GameLord", score: "16-13", duration: "22:15", date: "15 мин назад" },
-        { id: "4", gameMode: "Арена", player1: "TopShooter", player2: "UltraGamer", winner: "UltraGamer", score: "10-8", duration: "12:45", date: "23 мин назад" },
-        { id: "5", gameMode: "Классика", player1: "ChampionX", player2: "SkillMaster", winner: "ChampionX", score: "16-12", duration: "20:33", date: "35 мин назад" },
-      ];
+      const mockPlayers: Player[] = [];
+      const mockMatches: Match[] = [];
 
       setTopPlayers(mockPlayers);
       setRecentMatches(mockMatches);
@@ -107,6 +89,12 @@ export default function Leaderboard() {
                   <div className="text-center py-8">
                     <Icon name="Loader2" size={32} className="animate-spin mx-auto mb-4" />
                     <p className="text-zinc-400">Загрузка рейтинга...</p>
+                  </div>
+                ) : topPlayers.length === 0 ? (
+                  <div className="text-center py-12">
+                    <Icon name="Trophy" size={48} className="mx-auto mb-4 text-zinc-600" />
+                    <p className="text-zinc-400">Рейтинг игроков пуст</p>
+                    <p className="text-zinc-500 text-sm mt-2">Станьте первым в таблице лидеров</p>
                   </div>
                 ) : (
                   <div className="space-y-4">

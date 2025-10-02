@@ -22,58 +22,7 @@ interface MatchHistory {
   date: string;
 }
 
-const matchHistory: MatchHistory[] = [
-  {
-    id: "1",
-    map: "Dust2",
-    result: "win",
-    score: "16:12",
-    kills: 24,
-    deaths: 16,
-    assists: 8,
-    date: "2024-01-15",
-  },
-  {
-    id: "2",
-    map: "Mirage",
-    result: "loss",
-    score: "14:16",
-    kills: 19,
-    deaths: 18,
-    assists: 12,
-    date: "2024-01-14",
-  },
-  {
-    id: "3",
-    map: "Inferno",
-    result: "win",
-    score: "16:8",
-    kills: 28,
-    deaths: 12,
-    assists: 6,
-    date: "2024-01-13",
-  },
-  {
-    id: "4",
-    map: "Cache",
-    result: "win",
-    score: "16:11",
-    kills: 21,
-    deaths: 15,
-    assists: 9,
-    date: "2024-01-12",
-  },
-  {
-    id: "5",
-    map: "Overpass",
-    result: "loss",
-    score: "13:16",
-    kills: 16,
-    deaths: 19,
-    assists: 11,
-    date: "2024-01-11",
-  },
-];
+const matchHistory: MatchHistory[] = [];
 
 export default function Profile() {
   return (
@@ -105,7 +54,7 @@ export default function Profile() {
                     </div>
                     <div className="text-right">
                       <div className="text-3xl font-bold text-yellow-400">
-                        2847
+                        0
                       </div>
                       <div className="text-xs text-zinc-400 uppercase tracking-wide">
                         Рейтинг
@@ -115,15 +64,15 @@ export default function Profile() {
 
                   <div className="grid grid-cols-3 gap-4 mb-6">
                     <div className="text-center">
-                      <div className="text-2xl font-bold text-white">1.76</div>
+                      <div className="text-2xl font-bold text-white">0</div>
                       <div className="text-xs text-zinc-400 uppercase">K/D</div>
                     </div>
                     <div className="text-center">
-                      <div className="text-2xl font-bold text-white">83.4</div>
+                      <div className="text-2xl font-bold text-white">0</div>
                       <div className="text-xs text-zinc-400 uppercase">ADR</div>
                     </div>
                     <div className="text-center">
-                      <div className="text-2xl font-bold text-white">42.3%</div>
+                      <div className="text-2xl font-bold text-white">0%</div>
                       <div className="text-xs text-zinc-400 uppercase">HS%</div>
                     </div>
                   </div>
@@ -132,13 +81,13 @@ export default function Profile() {
                     <div className="bg-black/20 rounded-lg p-3">
                       <div className="flex items-center justify-between">
                         <span className="text-zinc-400 text-sm">Победы</span>
-                        <span className="text-white font-bold">156</span>
+                        <span className="text-white font-bold">0</span>
                       </div>
                     </div>
                     <div className="bg-black/20 rounded-lg p-3">
                       <div className="flex items-center justify-between">
                         <span className="text-zinc-400 text-sm">Винрейт</span>
-                        <span className="text-white font-bold">63.7%</span>
+                        <span className="text-white font-bold">0%</span>
                       </div>
                     </div>
                   </div>
@@ -167,35 +116,35 @@ export default function Profile() {
               <CardContent>
                 <div className="grid grid-cols-2 gap-4">
                   <div className="text-center">
-                    <p className="text-2xl font-bold text-white">89</p>
+                    <p className="text-2xl font-bold text-white">0</p>
                     <p className="text-zinc-400 text-sm">Поражений</p>
                   </div>
                   <div className="text-center">
-                    <p className="text-2xl font-bold text-white">0.71</p>
+                    <p className="text-2xl font-bold text-white">0</p>
                     <p className="text-zinc-400 text-sm">KPR</p>
                   </div>
                   <div className="text-center">
-                    <p className="text-2xl font-bold text-white">0.40</p>
+                    <p className="text-2xl font-bold text-white">0</p>
                     <p className="text-zinc-400 text-sm">DPR</p>
                   </div>
                   <div className="text-center">
-                    <p className="text-2xl font-bold text-white">245</p>
+                    <p className="text-2xl font-bold text-white">0</p>
                     <p className="text-zinc-400 text-sm">Общие игры</p>
                   </div>
                   <div className="text-center">
-                    <p className="text-2xl font-bold text-white">3,842</p>
+                    <p className="text-2xl font-bold text-white">0</p>
                     <p className="text-zinc-400 text-sm">Общие убийства</p>
                   </div>
                   <div className="text-center">
-                    <p className="text-2xl font-bold text-white">187</p>
+                    <p className="text-2xl font-bold text-white">0</p>
                     <p className="text-zinc-400 text-sm">МВП</p>
                   </div>
                   <div className="text-center">
-                    <p className="text-2xl font-bold text-white">84.2</p>
+                    <p className="text-2xl font-bold text-white">0</p>
                     <p className="text-zinc-400 text-sm">Средний урон</p>
                   </div>
                   <div className="text-center">
-                    <p className="text-2xl font-bold text-white">12</p>
+                    <p className="text-2xl font-bold text-white">0</p>
                     <p className="text-zinc-400 text-sm">Клатчи</p>
                   </div>
                 </div>
@@ -284,79 +233,89 @@ export default function Profile() {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="space-y-4">
-                {matchHistory.map((match) => (
-                  <div
-                    key={match.id}
-                    className={`p-4 rounded-lg border transition-colors ${
-                      match.result === "win"
-                        ? "bg-green-500/10 border-green-500/30"
-                        : "bg-red-500/10 border-red-500/30"
-                    }`}
-                  >
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center space-x-4">
-                        <div
-                          className={`w-3 h-3 rounded-full ${
-                            match.result === "win"
-                              ? "bg-green-500"
-                              : "bg-red-500"
-                          }`}
-                        ></div>
-                        <div>
-                          <h4 className="font-semibold text-white">
-                            {match.map}
-                          </h4>
-                          <p className="text-zinc-400 text-sm">
-                            {match.result === "win" ? "Победа" : "Поражение"} -{" "}
-                            {match.score}
-                          </p>
-                        </div>
-                      </div>
+              {matchHistory.length === 0 ? (
+                <div className="text-center py-12">
+                  <Icon name="Gamepad2" size={48} className="mx-auto mb-4 text-zinc-600" />
+                  <p className="text-zinc-400">История матчей пуста</p>
+                  <p className="text-zinc-500 text-sm mt-2">Сыграйте свой первый матч</p>
+                </div>
+              ) : (
+                <>
+                  <div className="space-y-4">
+                    {matchHistory.map((match) => (
+                      <div
+                        key={match.id}
+                        className={`p-4 rounded-lg border transition-colors ${
+                          match.result === "win"
+                            ? "bg-green-500/10 border-green-500/30"
+                            : "bg-red-500/10 border-red-500/30"
+                        }`}
+                      >
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center space-x-4">
+                            <div
+                              className={`w-3 h-3 rounded-full ${
+                                match.result === "win"
+                                  ? "bg-green-500"
+                                  : "bg-red-500"
+                              }`}
+                            ></div>
+                            <div>
+                              <h4 className="font-semibold text-white">
+                                {match.map}
+                              </h4>
+                              <p className="text-zinc-400 text-sm">
+                                {match.result === "win" ? "Победа" : "Поражение"} -{" "}
+                                {match.score}
+                              </p>
+                            </div>
+                          </div>
 
-                      <div className="flex items-center space-x-6">
-                        <div className="text-center">
-                          <p className="text-lg font-bold text-white">
-                            {match.kills}
-                          </p>
-                          <p className="text-zinc-400 text-xs">Убийств</p>
-                        </div>
-                        <div className="text-center">
-                          <p className="text-lg font-bold text-white">
-                            {match.deaths}
-                          </p>
-                          <p className="text-zinc-400 text-xs">Смертей</p>
-                        </div>
-                        <div className="text-center">
-                          <p className="text-lg font-bold text-white">
-                            {match.assists}
-                          </p>
-                          <p className="text-zinc-400 text-xs">Помощи</p>
-                        </div>
-                        <div className="text-center">
-                          <p className="text-lg font-bold text-white">
-                            {(match.kills / match.deaths).toFixed(1)}
-                          </p>
-                          <p className="text-zinc-400 text-xs">K/D</p>
-                        </div>
-                        <div className="text-right">
-                          <p className="text-zinc-400 text-sm">{match.date}</p>
+                          <div className="flex items-center space-x-6">
+                            <div className="text-center">
+                              <p className="text-lg font-bold text-white">
+                                {match.kills}
+                              </p>
+                              <p className="text-zinc-400 text-xs">Убийств</p>
+                            </div>
+                            <div className="text-center">
+                              <p className="text-lg font-bold text-white">
+                                {match.deaths}
+                              </p>
+                              <p className="text-zinc-400 text-xs">Смертей</p>
+                            </div>
+                            <div className="text-center">
+                              <p className="text-lg font-bold text-white">
+                                {match.assists}
+                              </p>
+                              <p className="text-zinc-400 text-xs">Помощи</p>
+                            </div>
+                            <div className="text-center">
+                              <p className="text-lg font-bold text-white">
+                                {(match.kills / match.deaths).toFixed(1)}
+                              </p>
+                              <p className="text-zinc-400 text-xs">K/D</p>
+                            </div>
+                            <div className="text-right">
+                              <p className="text-zinc-400 text-sm">{match.date}</p>
+                            </div>
+                          </div>
                         </div>
                       </div>
-                    </div>
+                    ))}
                   </div>
-                ))}
-              </div>
 
-              <div className="mt-6 text-center">
-                <Button
-                  variant="outline"
-                  className="border-zinc-700 text-zinc-300 hover:text-white"
-                >
-                  <Icon name="MoreHorizontal" size={20} className="mr-2" />
-                  Показать больше
-                </Button>
-              </div>
+                  <div className="mt-6 text-center">
+                    <Button
+                      variant="outline"
+                      className="border-zinc-700 text-zinc-300 hover:text-white"
+                    >
+                      <Icon name="MoreHorizontal" size={20} className="mr-2" />
+                      Показать больше
+                    </Button>
+                  </div>
+                </>
+              )}
             </CardContent>
           </Card>
         </div>
