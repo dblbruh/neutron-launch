@@ -119,23 +119,52 @@ export default function ProfileSettings() {
                 </CardHeader>
                 <CardContent className="space-y-6">
                   <div className="flex items-center space-x-6">
-                    <div className="w-24 h-24 bg-gradient-to-br from-yellow-400 to-yellow-600 rounded-full flex items-center justify-center text-3xl font-bold text-black">
-                      {formData.displayName?.[0]?.toUpperCase() || user.username[0].toUpperCase()}
+                    <div className="w-24 h-24 bg-gradient-to-br from-yellow-400 to-yellow-600 rounded-full flex items-center justify-center text-3xl font-bold text-black overflow-hidden">
+                      {formData.avatarUrl ? (
+                        <img src={formData.avatarUrl} alt="Avatar" className="w-full h-full object-cover" />
+                      ) : (
+                        formData.displayName?.[0]?.toUpperCase() || user.username[0].toUpperCase()
+                      )}
                     </div>
                     <div className="flex-1">
-                      <Label className="text-zinc-300 mb-2 block">URL аватара</Label>
+                      <Label className="text-zinc-300 mb-2 block">Аватар</Label>
                       <div className="flex gap-2">
-                        <Input
-                          value={formData.avatarUrl}
-                          onChange={(e) => setFormData({ ...formData, avatarUrl: e.target.value })}
-                          placeholder="https://example.com/avatar.jpg"
-                          className="bg-zinc-800 border-zinc-700 text-white"
-                        />
-                        <Button variant="outline" className="border-zinc-700" disabled>
-                          <Icon name="Upload" size={16} />
+                        <Button 
+                          variant="outline" 
+                          className="border-zinc-700 hover:border-yellow-500"
+                          onClick={() => document.getElementById('avatar-upload')?.click()}
+                        >
+                          <Icon name="Upload" size={16} className="mr-2" />
+                          Загрузить с ПК
                         </Button>
+                        <input
+                          id="avatar-upload"
+                          type="file"
+                          accept="image/*"
+                          className="hidden"
+                          onChange={(e) => {
+                            const file = e.target.files?.[0];
+                            if (file) {
+                              const reader = new FileReader();
+                              reader.onloadend = () => {
+                                setFormData({ ...formData, avatarUrl: reader.result as string });
+                              };
+                              reader.readAsDataURL(file);
+                            }
+                          }}
+                        />
+                        {formData.avatarUrl && (
+                          <Button 
+                            variant="outline" 
+                            className="border-red-500/50 text-red-400 hover:bg-red-500/10"
+                            onClick={() => setFormData({ ...formData, avatarUrl: '' })}
+                          >
+                            <Icon name="X" size={16} className="mr-2" />
+                            Удалить
+                          </Button>
+                        )}
                       </div>
-                      <p className="text-xs text-zinc-500 mt-1">Вставьте ссылку на изображение</p>
+                      <p className="text-xs text-zinc-500 mt-1">Поддерживаются JPG, PNG, GIF до 5 МБ</p>
                     </div>
                   </div>
 
