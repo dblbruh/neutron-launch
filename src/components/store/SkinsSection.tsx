@@ -1,7 +1,7 @@
 import Icon from "@/components/ui/icon";
 import SkinCard from "./SkinCard";
 import { skins } from "./storeData";
-import { useAuth } from "@/hooks/useAuth";
+import { useAuth } from "@/context/AuthContext";
 
 export default function SkinsSection() {
   const { user } = useAuth();

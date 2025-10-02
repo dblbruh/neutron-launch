@@ -6,7 +6,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { useMatchmaking } from "@/hooks/useMatchmaking";
-import { useAuth } from "@/hooks/useAuth";
+import { useAuth } from "@/context/AuthContext";
 import MatchmakingProgress from "./matchmaking/MatchmakingProgress";
 import MatchmakingStats from "./matchmaking/MatchmakingStats";
 import TeamsDisplay from "./matchmaking/TeamsDisplay";

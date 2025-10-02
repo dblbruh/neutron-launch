@@ -128,7 +128,7 @@ export default function Header() {
                     Регистрация
                   </Button>
                 </Link>
-              <>
+              </>
             )}
           </div>
         </nav>
