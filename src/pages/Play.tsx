@@ -24,18 +24,10 @@ interface GameMode {
 
 const gameModes: GameMode[] = [
   {
-    id: "solo",
-    name: "Соло игра",
-    description: "Играйте в одиночку против других игроков",
-    players: "1 vs 1",
-    duration: "15-30 мин",
-    icon: "User",
-  },
-  {
-    id: "team",
-    name: "Игра своей командой",
-    description: "Играйте с друзьями в составе команды",
-    players: "5 vs 5",
+    id: "lobby",
+    name: "Лобби",
+    description: "Соберите команду из друзей и найдите матч",
+    players: "1-5 игроков",
     duration: "30-45 мин",
     icon: "Users",
   },
@@ -153,6 +145,10 @@ export default function Play() {
   const [selectedGameMode, setSelectedGameMode] = useState("");
 
   const handleFindGame = (mode: GameMode) => {
+    if (mode.id === 'lobby') {
+      navigate('/lobby');
+      return;
+    }
     if (mode.id === 'challenges') {
       navigate('/challenges');
       return;
@@ -173,7 +169,7 @@ export default function Play() {
           </p>
         </div>
 
-        <div className="grid grid-cols-4 gap-6 max-w-7xl mx-auto mb-16">
+        <div className="grid grid-cols-3 gap-6 max-w-5xl mx-auto mb-16">
           {gameModes.map((mode) => (
             <Card
               key={mode.id}

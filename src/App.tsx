@@ -7,6 +7,7 @@ import { AuthProvider } from "./context/AuthContext";
 import Index from "./pages/Index";
 import Subscription from "./pages/Subscription";
 import Play from "./pages/Play";
+import Lobby from "./pages/Lobby";
 import Friends from "./pages/Friends";
 import Profile from "./pages/Profile";
 import ProfileSettings from "./pages/ProfileSettings";
@@ -34,6 +35,7 @@ const App = () => (
             <Route path="/" element={<Index />} />
             <Route path="/subscription" element={<Subscription />} />
             <Route path="/play" element={<Play />} />
+            <Route path="/lobby" element={<Lobby />} />
             <Route path="/friends" element={<Friends />} />
             <Route path="/profile" element={<Profile />} />
             <Route path="/profile/settings" element={<ProfileSettings />} />
