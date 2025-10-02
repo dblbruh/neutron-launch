@@ -89,8 +89,9 @@ def register_user(data: Dict[str, Any], headers: Dict[str, str]) -> Dict[str, An
     email = data.get('email', '').strip().lower()
     password = data.get('password', '')
     display_name = data.get('displayName', username).strip()
+    region = data.get('region', '').strip()
+    age = data.get('age')
     
-    # Валидация данных
     if not username:
         return {'statusCode': 400, 'headers': headers, 'body': json.dumps({'error': 'Логин обязателен'})}
     
@@ -111,7 +112,12 @@ def register_user(data: Dict[str, Any], headers: Dict[str, str]) -> Dict[str, An
     if password_error:
         return {'statusCode': 400, 'headers': headers, 'body': json.dumps({'error': password_error})}
     
-    # Подключение к базе данных
+    if not region:
+        return {'statusCode': 400, 'headers': headers, 'body': json.dumps({'error': 'Регион обязателен'})}
+    
+    if not age or not isinstance(age, int) or age < 13 or age > 100:
+        return {'statusCode': 400, 'headers': headers, 'body': json.dumps({'error': 'Укажите корректный возраст (13-100)'})}
+    
     database_url = os.environ.get('DATABASE_URL')
     if not database_url:
         return {'statusCode': 500, 'headers': headers, 'body': json.dumps({'error': 'Database connection error'})}
@@ -120,7 +126,15 @@ def register_user(data: Dict[str, Any], headers: Dict[str, str]) -> Dict[str, An
         conn = psycopg2.connect(database_url)
         cur = conn.cursor()
         
-        # Проверка на существующего пользователя
+        cur.execute("""
+            ALTER TABLE users 
+            ADD COLUMN IF NOT EXISTS region VARCHAR(100),
+            ADD COLUMN IF NOT EXISTS age INTEGER,
+            ADD COLUMN IF NOT EXISTS show_age BOOLEAN DEFAULT true,
+            ADD COLUMN IF NOT EXISTS avatar_url TEXT
+        """)
+        conn.commit()
+        
         cur.execute("SELECT id FROM users WHERE username = %s OR email = %s", (username, email))
         existing_user = cur.fetchone()
         
@@ -133,15 +147,13 @@ def register_user(data: Dict[str, Any], headers: Dict[str, str]) -> Dict[str, An
                 'body': json.dumps({'error': 'Пользователь с таким логином или email уже существует'})
             }
         
-        # Хеширование пароля
         password_hash = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
         
-        # Создание пользователя
         cur.execute("""
-            INSERT INTO users (username, email, password_hash, display_name, points, level)
-            VALUES (%s, %s, %s, %s, %s, %s)
-            RETURNING id, username, email, display_name, points, level, created_at, is_admin
-        """, (username, email, password_hash, display_name, 100, 1))
+            INSERT INTO users (username, email, password_hash, display_name, region, age, show_age, points, level)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
+            RETURNING id, username, email, display_name, region, age, show_age, points, level, created_at, is_admin
+        """, (username, email, password_hash, display_name, region, age, True, 100, 1))
         
         new_user = cur.fetchone()
         conn.commit()
@@ -151,10 +163,13 @@ def register_user(data: Dict[str, Any], headers: Dict[str, str]) -> Dict[str, An
             'username': new_user[1],
             'email': new_user[2],
             'displayName': new_user[3],
-            'points': new_user[4],
-            'level': new_user[5],
-            'createdAt': new_user[6].isoformat(),
-            'isAdmin': new_user[7] if len(new_user) > 7 else False
+            'region': new_user[4],
+            'age': new_user[5],
+            'showAge': new_user[6],
+            'points': new_user[7],
+            'level': new_user[8],
+            'createdAt': new_user[9].isoformat(),
+            'isAdmin': new_user[10] if len(new_user) > 10 else False
         }
         
         cur.close()
@@ -195,9 +210,9 @@ def login_user(data: Dict[str, Any], headers: Dict[str, str]) -> Dict[str, Any]:
         conn = psycopg2.connect(database_url)
         cur = conn.cursor()
         
-        # Поиск пользователя по username или email
         cur.execute("""
-            SELECT id, username, email, password_hash, display_name, points, level, wins, losses, is_admin 
+            SELECT id, username, email, password_hash, display_name, region, age, show_age, 
+                   avatar_url, points, level, wins, losses, is_admin 
             FROM users 
             WHERE (username = %s OR email = %s) AND is_active = true
         """, (login, login))
@@ -213,7 +228,6 @@ def login_user(data: Dict[str, Any], headers: Dict[str, str]) -> Dict[str, Any]:
                 'body': json.dumps({'error': 'Неверный логин или пароль'})
             }
         
-        # Проверка пароля
         if not bcrypt.checkpw(password.encode('utf-8'), user[3].encode('utf-8')):
             return {
                 'statusCode': 401,
@@ -226,11 +240,15 @@ def login_user(data: Dict[str, Any], headers: Dict[str, str]) -> Dict[str, Any]:
             'username': user[1],
             'email': user[2],
             'displayName': user[4],
-            'points': user[5],
-            'level': user[6],
-            'wins': user[7],
-            'losses': user[8],
-            'isAdmin': user[9] if len(user) > 9 else False
+            'region': user[5],
+            'age': user[6],
+            'showAge': user[7],
+            'avatarUrl': user[8],
+            'points': user[9],
+            'level': user[10],
+            'wins': user[11],
+            'losses': user[12],
+            'isAdmin': user[13] if len(user) > 13 else False
         }
         
         return {

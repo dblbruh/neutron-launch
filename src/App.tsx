@@ -9,6 +9,7 @@ import Subscription from "./pages/Subscription";
 import Play from "./pages/Play";
 import Friends from "./pages/Friends";
 import Profile from "./pages/Profile";
+import ProfileSettings from "./pages/ProfileSettings";
 import Leaderboard from "./pages/Leaderboard";
 import Tournaments from "./pages/Tournaments";
 import Challenges from "./pages/Challenges";
@@ -35,6 +36,7 @@ const App = () => (
             <Route path="/play" element={<Play />} />
             <Route path="/friends" element={<Friends />} />
             <Route path="/profile" element={<Profile />} />
+            <Route path="/profile/settings" element={<ProfileSettings />} />
             <Route path="/leaderboard" element={<Leaderboard />} />
             <Route path="/tournaments" element={<Tournaments />} />
             <Route path="/challenges" element={<Challenges />} />

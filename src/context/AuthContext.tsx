@@ -5,6 +5,10 @@ interface User {
   username: string;
   email: string;
   displayName: string;
+  region?: string;
+  age?: number;
+  showAge?: boolean;
+  avatarUrl?: string;
   points: number;
   level: number;
   wins?: number;

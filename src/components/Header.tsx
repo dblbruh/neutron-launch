@@ -172,6 +172,13 @@ export default function Header() {
                         Мой профиль
                       </Link>
                     </DropdownMenuItem>
+
+                    <DropdownMenuItem className="text-zinc-300 focus:text-white focus:bg-zinc-800" asChild>
+                      <Link to="/profile/settings" className="flex items-center cursor-pointer">
+                        <Icon name="Settings" size={16} className="mr-2" />
+                        Настройки профиля
+                      </Link>
+                    </DropdownMenuItem>
                     
                     <DropdownMenuItem className="text-zinc-300 focus:text-white focus:bg-zinc-800" asChild>
                       <Link to="/friends" className="flex items-center cursor-pointer">

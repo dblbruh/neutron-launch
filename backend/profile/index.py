@@ -18,7 +18,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             'statusCode': 200,
             'headers': {
                 'Access-Control-Allow-Origin': '*',
-                'Access-Control-Allow-Methods': 'GET, OPTIONS',
+                'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
                 'Access-Control-Allow-Headers': 'Content-Type, X-User-Id',
                 'Access-Control-Max-Age': '86400'
             },
@@ -26,10 +26,15 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             'isBase64Encoded': False
         }
     
+    cors_headers = {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'}
+    
+    if method == 'POST':
+        return update_profile_settings(event, context, cors_headers)
+    
     if method != 'GET':
         return {
             'statusCode': 405,
-            'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+            'headers': cors_headers,
             'body': json.dumps({'error': 'Method not allowed'}),
             'isBase64Encoded': False
         }
@@ -114,3 +119,82 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
         'body': json.dumps(profile_data),
         'isBase64Encoded': False
     }
+
+def update_profile_settings(event: Dict[str, Any], context: Any, headers: Dict[str, str]) -> Dict[str, Any]:
+    try:
+        body = json.loads(event.get('body', '{}'))
+        action = body.get('action')
+        
+        if action != 'update_settings':
+            return {
+                'statusCode': 400,
+                'headers': headers,
+                'body': json.dumps({'error': 'Invalid action'}),
+                'isBase64Encoded': False
+            }
+        
+        user_id = body.get('user_id')
+        display_name = body.get('display_name', '').strip()
+        show_age = body.get('show_age', True)
+        avatar_url = body.get('avatar_url', '').strip() or None
+        
+        if not user_id:
+            return {
+                'statusCode': 400,
+                'headers': headers,
+                'body': json.dumps({'error': 'user_id required'}),
+                'isBase64Encoded': False
+            }
+        
+        database_url = os.environ.get('DATABASE_URL')
+        if not database_url:
+            return {
+                'statusCode': 500,
+                'headers': headers,
+                'body': json.dumps({'error': 'Database configuration missing'}),
+                'isBase64Encoded': False
+            }
+        
+        conn = psycopg2.connect(database_url)
+        cursor = conn.cursor()
+        
+        cursor.execute("""
+            UPDATE users 
+            SET display_name = %s, show_age = %s, avatar_url = %s
+            WHERE id = %s AND is_active = true
+            RETURNING id
+        """, (display_name, show_age, avatar_url, user_id))
+        
+        if cursor.rowcount == 0:
+            cursor.close()
+            conn.close()
+            return {
+                'statusCode': 404,
+                'headers': headers,
+                'body': json.dumps({'error': 'User not found'}),
+                'isBase64Encoded': False
+            }
+        
+        conn.commit()
+        cursor.close()
+        conn.close()
+        
+        return {
+            'statusCode': 200,
+            'headers': headers,
+            'body': json.dumps({
+                'message': 'Settings updated successfully',
+                'displayName': display_name,
+                'showAge': show_age,
+                'avatarUrl': avatar_url
+            }),
+            'isBase64Encoded': False
+        }
+        
+    except Exception as e:
+        return {
+            'statusCode': 500,
+            'headers': headers,
+            'body': json.dumps({'error': str(e)}),
+            'isBase64Encoded': False
+        }
