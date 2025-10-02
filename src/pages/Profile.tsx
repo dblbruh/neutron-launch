@@ -1,3 +1,4 @@
+import { useState, useEffect } from "react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
@@ -10,6 +11,22 @@ import {
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import Icon from "@/components/ui/icon";
+import funcUrls from "../../backend/func2url.json";
+
+interface UserProfile {
+  id: number;
+  username: string;
+  displayName: string;
+  avatarUrl?: string;
+  points: number;
+  level: number;
+  wins: number;
+  losses: number;
+  winRate: number;
+  kdRatio: number;
+  totalMatches: number;
+  memberSince?: string;
+}
 
 interface MatchHistory {
   id: string;
@@ -25,6 +42,60 @@ interface MatchHistory {
 const matchHistory: MatchHistory[] = [];
 
 export default function Profile() {
+  const [profile, setProfile] = useState<UserProfile | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const loadProfile = async () => {
+      const userId = 1;
+      
+      const profileUrl = funcUrls.profile as string;
+      const response = await fetch(`${profileUrl}?user_id=${userId}`);
+      
+      if (!response.ok) {
+        setError('Не удалось загрузить профиль');
+        setLoading(false);
+        return;
+      }
+      
+      const data = await response.json();
+      setProfile(data);
+      setLoading(false);
+    };
+
+    loadProfile();
+  }, []);
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-black text-white">
+        <Header />
+        <main className="container mx-auto px-4 py-16 flex items-center justify-center">
+          <div className="text-center">
+            <Icon name="Loader2" size={48} className="animate-spin mx-auto mb-4 text-yellow-400" />
+            <p className="text-zinc-400">Загрузка профиля...</p>
+          </div>
+        </main>
+        <Footer />
+      </div>
+    );
+  }
+
+  if (error || !profile) {
+    return (
+      <div className="min-h-screen bg-black text-white">
+        <Header />
+        <main className="container mx-auto px-4 py-16 flex items-center justify-center">
+          <div className="text-center">
+            <Icon name="AlertCircle" size={48} className="mx-auto mb-4 text-red-400" />
+            <p className="text-zinc-400">{error || 'Профиль не найден'}</p>
+          </div>
+        </main>
+        <Footer />
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-black text-white">
       <Header />
@@ -41,20 +112,24 @@ export default function Profile() {
                   <div className="flex items-start justify-between mb-6">
                     <div className="flex items-center space-x-4">
                       <div className="w-16 h-16 bg-gradient-to-br from-yellow-400 to-yellow-600 rounded-lg flex items-center justify-center shadow-lg">
-                        <Icon name="User" size={32} className="text-black" />
+                        {profile.avatarUrl ? (
+                          <img src={profile.avatarUrl} alt={profile.displayName} className="w-full h-full rounded-lg object-cover" />
+                        ) : (
+                          <Icon name="User" size={32} className="text-black" />
+                        )}
                       </div>
                       <div>
                         <h3 className="text-xl font-bold text-white">
-                          ProGamer_2024
+                          {profile.displayName}
                         </h3>
                         <p className="text-yellow-400 text-sm font-medium">
-                          Золотой элит мастер
+                          @{profile.username}
                         </p>
                       </div>
                     </div>
                     <div className="text-right">
                       <div className="text-3xl font-bold text-yellow-400">
-                        0
+                        {profile.points}
                       </div>
                       <div className="text-xs text-zinc-400 uppercase tracking-wide">
                         Рейтинг
@@ -64,16 +139,16 @@ export default function Profile() {
 
                   <div className="grid grid-cols-3 gap-4 mb-6">
                     <div className="text-center">
-                      <div className="text-2xl font-bold text-white">0</div>
+                      <div className="text-2xl font-bold text-white">{profile.kdRatio.toFixed(2)}</div>
                       <div className="text-xs text-zinc-400 uppercase">K/D</div>
                     </div>
                     <div className="text-center">
-                      <div className="text-2xl font-bold text-white">0</div>
-                      <div className="text-xs text-zinc-400 uppercase">ADR</div>
+                      <div className="text-2xl font-bold text-white">{profile.level}</div>
+                      <div className="text-xs text-zinc-400 uppercase">Уровень</div>
                     </div>
                     <div className="text-center">
-                      <div className="text-2xl font-bold text-white">0%</div>
-                      <div className="text-xs text-zinc-400 uppercase">HS%</div>
+                      <div className="text-2xl font-bold text-white">{profile.winRate}%</div>
+                      <div className="text-xs text-zinc-400 uppercase">Винрейт</div>
                     </div>
                   </div>
 
@@ -81,25 +156,25 @@ export default function Profile() {
                     <div className="bg-black/20 rounded-lg p-3">
                       <div className="flex items-center justify-between">
                         <span className="text-zinc-400 text-sm">Победы</span>
-                        <span className="text-white font-bold">0</span>
+                        <span className="text-white font-bold">{profile.wins}</span>
                       </div>
                     </div>
                     <div className="bg-black/20 rounded-lg p-3">
                       <div className="flex items-center justify-between">
-                        <span className="text-zinc-400 text-sm">Винрейт</span>
-                        <span className="text-white font-bold">0%</span>
+                        <span className="text-zinc-400 text-sm">Поражения</span>
+                        <span className="text-white font-bold">{profile.losses}</span>
                       </div>
                     </div>
                   </div>
 
                   <div className="grid grid-cols-2 gap-4 text-sm">
                     <div className="flex items-center justify-between">
-                      <span className="text-zinc-400">Регион</span>
-                      <span className="text-white">Москва</span>
+                      <span className="text-zinc-400">Всего игр</span>
+                      <span className="text-white">{profile.totalMatches}</span>
                     </div>
                     <div className="flex items-center justify-between">
-                      <span className="text-zinc-400">Команда</span>
-                      <span className="text-white">FireStorm</span>
+                      <span className="text-zinc-400">Уровень</span>
+                      <span className="text-white">{profile.level}</span>
                     </div>
                   </div>
                 </CardContent>
@@ -110,42 +185,34 @@ export default function Profile() {
               <CardHeader>
                 <CardTitle className="text-xl font-bold text-white">
                   <Icon name="Target" size={24} className="mr-2 inline" />
-                  Дополнительная статистика
+                  Статистика
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="grid grid-cols-2 gap-4">
                   <div className="text-center">
-                    <p className="text-2xl font-bold text-white">0</p>
-                    <p className="text-zinc-400 text-sm">Поражений</p>
+                    <p className="text-2xl font-bold text-white">{profile.wins}</p>
+                    <p className="text-zinc-400 text-sm">Победы</p>
                   </div>
                   <div className="text-center">
-                    <p className="text-2xl font-bold text-white">0</p>
-                    <p className="text-zinc-400 text-sm">KPR</p>
+                    <p className="text-2xl font-bold text-white">{profile.losses}</p>
+                    <p className="text-zinc-400 text-sm">Поражения</p>
                   </div>
                   <div className="text-center">
-                    <p className="text-2xl font-bold text-white">0</p>
-                    <p className="text-zinc-400 text-sm">DPR</p>
+                    <p className="text-2xl font-bold text-white">{profile.points}</p>
+                    <p className="text-zinc-400 text-sm">Очки</p>
                   </div>
                   <div className="text-center">
-                    <p className="text-2xl font-bold text-white">0</p>
-                    <p className="text-zinc-400 text-sm">Общие игры</p>
+                    <p className="text-2xl font-bold text-white">{profile.totalMatches}</p>
+                    <p className="text-zinc-400 text-sm">Всего матчей</p>
                   </div>
                   <div className="text-center">
-                    <p className="text-2xl font-bold text-white">0</p>
-                    <p className="text-zinc-400 text-sm">Общие убийства</p>
+                    <p className="text-2xl font-bold text-white">{profile.winRate}%</p>
+                    <p className="text-zinc-400 text-sm">Винрейт</p>
                   </div>
                   <div className="text-center">
-                    <p className="text-2xl font-bold text-white">0</p>
-                    <p className="text-zinc-400 text-sm">МВП</p>
-                  </div>
-                  <div className="text-center">
-                    <p className="text-2xl font-bold text-white">0</p>
-                    <p className="text-zinc-400 text-sm">Средний урон</p>
-                  </div>
-                  <div className="text-center">
-                    <p className="text-2xl font-bold text-white">0</p>
-                    <p className="text-zinc-400 text-sm">Клатчи</p>
+                    <p className="text-2xl font-bold text-white">{profile.kdRatio.toFixed(2)}</p>
+                    <p className="text-zinc-400 text-sm">K/D</p>
                   </div>
                 </div>
               </CardContent>

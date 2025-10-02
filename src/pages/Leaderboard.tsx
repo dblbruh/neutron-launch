@@ -4,6 +4,7 @@ import Footer from "@/components/Footer";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import Icon from "@/components/ui/icon";
+import funcUrls from "../../backend/func2url.json";
 
 interface Player {
   id: number;
@@ -13,18 +14,16 @@ interface Player {
   level: number;
   wins: number;
   losses: number;
-  avatar?: string;
+  avatarUrl?: string;
   winRate: number;
 }
 
 interface Match {
   id: string;
-  gameMode: string;
   player1: string;
   player2: string;
   winner: string;
-  score: string;
-  duration: string;
+  status: string;
   date: string;
 }
 
@@ -35,11 +34,17 @@ export default function Leaderboard() {
 
   useEffect(() => {
     const loadData = async () => {
-      const mockPlayers: Player[] = [];
-      const mockMatches: Match[] = [];
-
-      setTopPlayers(mockPlayers);
-      setRecentMatches(mockMatches);
+      const leaderboardUrl = funcUrls.leaderboard as string;
+      const response = await fetch(leaderboardUrl);
+      
+      if (!response.ok) {
+        setLoading(false);
+        return;
+      }
+      
+      const data = await response.json();
+      setTopPlayers(data.players || []);
+      setRecentMatches(data.recentMatches || []);
       setLoading(false);
     };
 
@@ -117,8 +122,8 @@ export default function Leaderboard() {
                             </div>
                             
                             <div className="w-12 h-12 bg-zinc-700 rounded-full flex items-center justify-center">
-                              {player.avatar ? (
-                                <img src={player.avatar} alt={player.displayName} className="w-full h-full rounded-full object-cover" />
+                              {player.avatarUrl ? (
+                                <img src={player.avatarUrl} alt={player.displayName} className="w-full h-full rounded-full object-cover" />
                               ) : (
                                 <Icon name="User" size={20} className="text-zinc-400" />
                               )}
@@ -177,44 +182,57 @@ export default function Leaderboard() {
                     <Icon name="Loader2" size={32} className="animate-spin mx-auto mb-4" />
                     <p className="text-zinc-400">Загрузка матчей...</p>
                   </div>
+                ) : recentMatches.length === 0 ? (
+                  <div className="text-center py-12">
+                    <Icon name="Gamepad2" size={48} className="mx-auto mb-4 text-zinc-600" />
+                    <p className="text-zinc-400">Нет завершенных матчей</p>
+                    <p className="text-zinc-500 text-sm mt-2">Сыграйте первый матч</p>
+                  </div>
                 ) : (
                   <div className="space-y-4">
-                    {recentMatches.map((match) => (
-                      <div 
-                        key={match.id}
-                        className="flex items-center justify-between p-4 rounded-lg bg-zinc-800/50"
-                      >
-                        <div className="flex items-center space-x-4">
-                          <div className="w-10 h-10 bg-blue-600/20 rounded-lg flex items-center justify-center">
-                            <Icon name="Gamepad2" size={20} className="text-blue-400" />
+                    {recentMatches.map((match) => {
+                      const matchDate = new Date(match.date);
+                      const timeAgo = Math.floor((Date.now() - matchDate.getTime()) / 60000);
+                      const displayTime = timeAgo < 60 ? `${timeAgo} мин назад` : 
+                                         timeAgo < 1440 ? `${Math.floor(timeAgo / 60)} ч назад` : 
+                                         `${Math.floor(timeAgo / 1440)} дн назад`;
+                      
+                      return (
+                        <div 
+                          key={match.id}
+                          className="flex items-center justify-between p-4 rounded-lg bg-zinc-800/50"
+                        >
+                          <div className="flex items-center space-x-4">
+                            <div className="w-10 h-10 bg-blue-600/20 rounded-lg flex items-center justify-center">
+                              <Icon name="Gamepad2" size={20} className="text-blue-400" />
+                            </div>
+                            
+                            <div>
+                              <div className="flex items-center space-x-2 mb-1">
+                                <span className="font-semibold text-white">{match.player1}</span>
+                                <span className="text-zinc-400">vs</span>
+                                <span className="font-semibold text-white">{match.player2}</span>
+                              </div>
+                              <div className="flex items-center space-x-3 text-sm text-zinc-400">
+                                <span>{match.status}</span>
+                              </div>
+                            </div>
                           </div>
                           
-                          <div>
-                            <div className="flex items-center space-x-2 mb-1">
-                              <span className="font-semibold text-white">{match.player1}</span>
-                              <span className="text-zinc-400">vs</span>
-                              <span className="font-semibold text-white">{match.player2}</span>
-                            </div>
-                            <div className="flex items-center space-x-3 text-sm text-zinc-400">
-                              <span>{match.gameMode}</span>
-                              <span>•</span>
-                              <span>{match.duration}</span>
+                          <div className="flex items-center space-x-4">
+                            {match.winner && (
+                              <div className="text-center">
+                                <div className="text-xs text-green-400">Победил: {match.winner}</div>
+                              </div>
+                            )}
+                            
+                            <div className="text-right text-sm text-zinc-500">
+                              {displayTime}
                             </div>
                           </div>
                         </div>
-                        
-                        <div className="flex items-center space-x-4">
-                          <div className="text-center">
-                            <div className="text-lg font-bold text-white mb-1">{match.score}</div>
-                            <div className="text-xs text-green-400">Победил: {match.winner}</div>
-                          </div>
-                          
-                          <div className="text-right text-sm text-zinc-500">
-                            {match.date}
-                          </div>
-                        </div>
-                      </div>
-                    ))}
+                      );
+                    })}
                   </div>
                 )}
               </CardContent>

@@ -1,7 +1,7 @@
 {
-  "tournaments": "https://functions.poehali.dev/a30419a0-33cb-4aac-8166-cdc77f6dca71",
+  "profile": "https://functions.poehali.dev/82b75392-508e-4ecc-83a4-2fb123a66ee9",
+  "leaderboard": "https://functions.poehali.dev/71226dec-aabc-4120-9020-02ad3c786adf",
   "matchmaking": "https://functions.poehali.dev/8b7952f0-521d-4a29-b7a8-2704ababaa06",
-  "steam-auth": "https://functions.poehali.dev/0837df2f-ad96-4ef7-8d47-383e1f4464bb",
   "stats": "https://functions.poehali.dev/5a8088dc-d117-4820-945d-27a56687c594",
   "auth": "https://functions.poehali.dev/49e260c2-e6f1-43ca-b561-c22af980a7cb"
 }
