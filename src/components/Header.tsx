@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import Icon from "@/components/ui/icon";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
 import {
   Dialog,
@@ -10,14 +10,23 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import UserSearch from "@/components/UserSearch";
 import funcUrls from "../../backend/func2url.json";
 
 export default function Header() {
   const { user, isAuthenticated, logout } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
   const [showSearch, setShowSearch] = useState(false);
   const [friendRequestsCount, setFriendRequestsCount] = useState(0);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const handleLogout = () => {
     logout();
@@ -46,65 +55,67 @@ export default function Header() {
     }
   };
 
+  const isActive = (path: string) => location.pathname === path;
+
   return (
-    <header className="border-b border-zinc-800 bg-black/95 backdrop-blur supports-[backdrop-filter]:bg-black/60">
-      <div className="container mx-auto px-4 py-4">
+    <header className="sticky top-0 z-50 border-b border-zinc-800 bg-black/95 backdrop-blur supports-[backdrop-filter]:bg-black/60">
+      <div className="container mx-auto px-4 py-3">
         <nav className="flex items-center justify-between">
-          <Link to="/" className="flex items-center space-x-2">
+          <Link to="/" className="flex items-center space-x-2 flex-shrink-0">
             <img
               src="https://cdn.poehali.dev/files/ffbab4cd-41e6-4c90-9cce-a53d16843226.png"
               alt="CHAMPLINK"
-              className="h-8 w-8 py-0 my-0 mx-0 px-[1px] object-contain"
+              className="h-8 w-8 object-contain"
             />
-            <h1 className="text-xl font-bold bg-gradient-to-r from-yellow-400 to-yellow-600 bg-clip-text text-transparent">
+            <h1 className="text-xl font-bold bg-gradient-to-r from-yellow-400 to-yellow-600 bg-clip-text text-transparent hidden sm:block">
               CHAMPLINK
             </h1>
           </Link>
-          <div className="hidden md:flex items-center space-x-6">
-            <Link
-              to="/"
-              className="text-zinc-300 hover:text-white transition-colors"
-            >
-              Главная
+
+          <div className="hidden lg:flex items-center space-x-1">
+            <Link to="/">
+              <Button 
+                variant="ghost" 
+                size="sm"
+                className={isActive('/') ? 'text-yellow-400' : 'text-zinc-400 hover:text-white'}
+              >
+                <Icon name="Home" size={16} className="mr-2" />
+                Главная
+              </Button>
             </Link>
-            <Link
-              to="/play"
-              className="text-zinc-300 hover:text-white transition-colors"
-            >
-              Играть
+            <Link to="/play">
+              <Button 
+                variant="ghost" 
+                size="sm"
+                className={isActive('/play') ? 'text-yellow-400' : 'text-zinc-400 hover:text-white'}
+              >
+                <Icon name="Gamepad2" size={16} className="mr-2" />
+                Играть
+              </Button>
             </Link>
-            <Link
-              to="/tournaments"
-              className="text-zinc-300 hover:text-white transition-colors"
-            >
-              Турниры
+            <Link to="/tournaments">
+              <Button 
+                variant="ghost" 
+                size="sm"
+                className={isActive('/tournaments') ? 'text-yellow-400' : 'text-zinc-400 hover:text-white'}
+              >
+                <Icon name="Trophy" size={16} className="mr-2" />
+                Турниры
+              </Button>
             </Link>
-            <Link
-              to="/leaderboard"
-              className="text-zinc-300 hover:text-white transition-colors"
-            >
-              Рейтинг
-            </Link>
-            <Link
-              to="/challenges"
-              className="text-zinc-300 hover:text-white transition-colors"
-            >
-              Вызовы
-            </Link>
-            <Link
-              to="/store"
-              className="text-zinc-300 hover:text-white transition-colors"
-            >
-              Магазин
-            </Link>
-            <Link
-              to="/news"
-              className="text-zinc-300 hover:text-white transition-colors"
-            >
-              Новости
+            <Link to="/leaderboard">
+              <Button 
+                variant="ghost" 
+                size="sm"
+                className={isActive('/leaderboard') ? 'text-yellow-400' : 'text-zinc-400 hover:text-white'}
+              >
+                <Icon name="Medal" size={16} className="mr-2" />
+                Рейтинг
+              </Button>
             </Link>
           </div>
-          <div className="flex items-center space-x-3">
+
+          <div className="flex items-center space-x-2">
             <Button
               variant="ghost"
               size="sm"
@@ -122,75 +133,108 @@ export default function Header() {
                     size="sm"
                     className="text-zinc-400 hover:text-white relative"
                   >
-                    <Icon name="UserPlus" size={18} />
+                    <Icon name="Bell" size={18} />
                     {friendRequestsCount > 0 && (
-                      <Badge className="absolute -top-1 -right-1 h-5 w-5 p-0 flex items-center justify-center bg-red-500 text-white text-xs">
-                        {friendRequestsCount > 9 ? '9+' : friendRequestsCount}
+                      <Badge className="absolute -top-1 -right-1 h-4 w-4 p-0 flex items-center justify-center bg-red-500 text-white text-[10px]">
+                        {friendRequestsCount > 9 ? '9' : friendRequestsCount}
                       </Badge>
                     )}
                   </Button>
                 </Link>
-                <Link to="/friends">
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="text-zinc-400 hover:text-white"
-                  >
-                    <Icon name="Users" size={18} />
-                  </Button>
-                </Link>
-              </>
-            ) : null}
-            
-            {isAuthenticated && user ? (
-              // Если пользователь авторизован
-              <>
-                <div className="flex items-center space-x-2">
+
+                <div className="hidden sm:flex items-center space-x-2 px-3 py-1 rounded-lg bg-zinc-900/50 border border-zinc-800">
                   <Icon name="Coins" size={16} className="text-yellow-400" />
-                  <span className="text-yellow-400 font-semibold">{user.points.toLocaleString()}</span>
+                  <span className="text-yellow-400 font-semibold text-sm">{user.points.toLocaleString()}</span>
                 </div>
-                {user.isAdmin && (
-                  <Link to="/admin">
+
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
                     <Button
-                      variant="outline"
+                      variant="ghost"
                       size="sm"
-                      className="border-yellow-600 text-yellow-400 hover:bg-yellow-400/10"
+                      className="text-zinc-300 hover:text-white"
                     >
-                      <Icon name="Shield" size={16} className="mr-2" />
-                      Админ
+                      <div className="w-8 h-8 bg-gradient-to-br from-yellow-400 to-yellow-600 rounded-full flex items-center justify-center font-bold text-black text-sm">
+                        {(user.displayName || user.username)[0].toUpperCase()}
+                      </div>
                     </Button>
-                  </Link>
-                )}
-                <Link to="/profile">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="border-zinc-700 text-zinc-300 hover:text-white"
-                  >
-                    <Icon name="User" size={16} className="mr-2" />
-                    {user.displayName || user.username}
-                  </Button>
-                </Link>
-                <Link to="/subscription">
-                  <Button
-                    size="sm"
-                    className="bg-gradient-to-r from-yellow-400 to-yellow-600 text-black hover:from-yellow-500 hover:to-yellow-700"
-                  >
-                    Подписка 150₽
-                  </Button>
-                </Link>
-                <Button
-                  onClick={handleLogout}
-                  variant="outline"
-                  size="sm"
-                  className="border-zinc-700 text-zinc-300 hover:text-white"
-                >
-                  <Icon name="LogOut" size={16} className="mr-2" />
-                  Выйти
-                </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent className="w-56 bg-zinc-900 border-zinc-800" align="end">
+                    <div className="px-2 py-2 text-sm">
+                      <p className="font-semibold text-white">{user.displayName || user.username}</p>
+                      <p className="text-xs text-zinc-400">@{user.username}</p>
+                    </div>
+                    <DropdownMenuSeparator className="bg-zinc-800" />
+                    
+                    <DropdownMenuItem className="text-zinc-300 focus:text-white focus:bg-zinc-800" asChild>
+                      <Link to="/profile" className="flex items-center cursor-pointer">
+                        <Icon name="User" size={16} className="mr-2" />
+                        Мой профиль
+                      </Link>
+                    </DropdownMenuItem>
+                    
+                    <DropdownMenuItem className="text-zinc-300 focus:text-white focus:bg-zinc-800" asChild>
+                      <Link to="/friends" className="flex items-center cursor-pointer">
+                        <Icon name="Users" size={16} className="mr-2" />
+                        Друзья
+                      </Link>
+                    </DropdownMenuItem>
+                    
+                    <DropdownMenuItem className="text-zinc-300 focus:text-white focus:bg-zinc-800" asChild>
+                      <Link to="/challenges" className="flex items-center cursor-pointer">
+                        <Icon name="Swords" size={16} className="mr-2" />
+                        Вызовы
+                      </Link>
+                    </DropdownMenuItem>
+                    
+                    <DropdownMenuItem className="text-zinc-300 focus:text-white focus:bg-zinc-800" asChild>
+                      <Link to="/store" className="flex items-center cursor-pointer">
+                        <Icon name="ShoppingBag" size={16} className="mr-2" />
+                        Магазин
+                      </Link>
+                    </DropdownMenuItem>
+
+                    <DropdownMenuItem className="text-zinc-300 focus:text-white focus:bg-zinc-800" asChild>
+                      <Link to="/news" className="flex items-center cursor-pointer">
+                        <Icon name="Newspaper" size={16} className="mr-2" />
+                        Новости
+                      </Link>
+                    </DropdownMenuItem>
+
+                    <DropdownMenuSeparator className="bg-zinc-800" />
+                    
+                    <DropdownMenuItem className="text-zinc-300 focus:text-white focus:bg-zinc-800" asChild>
+                      <Link to="/subscription" className="flex items-center cursor-pointer">
+                        <Icon name="Crown" size={16} className="mr-2 text-yellow-400" />
+                        <span className="text-yellow-400">Подписка Premium</span>
+                      </Link>
+                    </DropdownMenuItem>
+
+                    {user.isAdmin && (
+                      <>
+                        <DropdownMenuSeparator className="bg-zinc-800" />
+                        <DropdownMenuItem className="text-yellow-400 focus:text-yellow-300 focus:bg-zinc-800" asChild>
+                          <Link to="/admin" className="flex items-center cursor-pointer">
+                            <Icon name="Shield" size={16} className="mr-2" />
+                            Админ-панель
+                          </Link>
+                        </DropdownMenuItem>
+                      </>
+                    )}
+                    
+                    <DropdownMenuSeparator className="bg-zinc-800" />
+                    
+                    <DropdownMenuItem 
+                      className="text-red-400 focus:text-red-300 focus:bg-zinc-800 cursor-pointer"
+                      onClick={handleLogout}
+                    >
+                      <Icon name="LogOut" size={16} className="mr-2" />
+                      Выйти
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
               </>
             ) : (
-              // Если пользователь не авторизован
               <>
                 <Link to="/login">
                   <Button
@@ -198,7 +242,6 @@ export default function Header() {
                     size="sm"
                     className="border-zinc-700 text-zinc-300 hover:text-white"
                   >
-                    <Icon name="LogIn" size={16} className="mr-2" />
                     Вход
                   </Button>
                 </Link>
@@ -207,14 +250,97 @@ export default function Header() {
                     size="sm"
                     className="bg-gradient-to-r from-yellow-400 to-yellow-600 text-black hover:from-yellow-500 hover:to-yellow-700"
                   >
-                    <Icon name="UserPlus" size={16} className="mr-2" />
                     Регистрация
                   </Button>
                 </Link>
               </>
             )}
+
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              className="lg:hidden text-zinc-400 hover:text-white"
+            >
+              <Icon name={mobileMenuOpen ? "X" : "Menu"} size={20} />
+            </Button>
           </div>
         </nav>
+
+        {mobileMenuOpen && (
+          <div className="lg:hidden mt-4 pb-4 space-y-2 border-t border-zinc-800 pt-4">
+            <Link to="/" onClick={() => setMobileMenuOpen(false)}>
+              <Button 
+                variant="ghost" 
+                size="sm"
+                className={`w-full justify-start ${isActive('/') ? 'text-yellow-400 bg-yellow-400/10' : 'text-zinc-400'}`}
+              >
+                <Icon name="Home" size={16} className="mr-2" />
+                Главная
+              </Button>
+            </Link>
+            <Link to="/play" onClick={() => setMobileMenuOpen(false)}>
+              <Button 
+                variant="ghost" 
+                size="sm"
+                className={`w-full justify-start ${isActive('/play') ? 'text-yellow-400 bg-yellow-400/10' : 'text-zinc-400'}`}
+              >
+                <Icon name="Gamepad2" size={16} className="mr-2" />
+                Играть
+              </Button>
+            </Link>
+            <Link to="/tournaments" onClick={() => setMobileMenuOpen(false)}>
+              <Button 
+                variant="ghost" 
+                size="sm"
+                className={`w-full justify-start ${isActive('/tournaments') ? 'text-yellow-400 bg-yellow-400/10' : 'text-zinc-400'}`}
+              >
+                <Icon name="Trophy" size={16} className="mr-2" />
+                Турниры
+              </Button>
+            </Link>
+            <Link to="/leaderboard" onClick={() => setMobileMenuOpen(false)}>
+              <Button 
+                variant="ghost" 
+                size="sm"
+                className={`w-full justify-start ${isActive('/leaderboard') ? 'text-yellow-400 bg-yellow-400/10' : 'text-zinc-400'}`}
+              >
+                <Icon name="Medal" size={16} className="mr-2" />
+                Рейтинг
+              </Button>
+            </Link>
+            <Link to="/challenges" onClick={() => setMobileMenuOpen(false)}>
+              <Button 
+                variant="ghost" 
+                size="sm"
+                className={`w-full justify-start ${isActive('/challenges') ? 'text-yellow-400 bg-yellow-400/10' : 'text-zinc-400'}`}
+              >
+                <Icon name="Swords" size={16} className="mr-2" />
+                Вызовы
+              </Button>
+            </Link>
+            <Link to="/store" onClick={() => setMobileMenuOpen(false)}>
+              <Button 
+                variant="ghost" 
+                size="sm"
+                className={`w-full justify-start ${isActive('/store') ? 'text-yellow-400 bg-yellow-400/10' : 'text-zinc-400'}`}
+              >
+                <Icon name="ShoppingBag" size={16} className="mr-2" />
+                Магазин
+              </Button>
+            </Link>
+            <Link to="/news" onClick={() => setMobileMenuOpen(false)}>
+              <Button 
+                variant="ghost" 
+                size="sm"
+                className={`w-full justify-start ${isActive('/news') ? 'text-yellow-400 bg-yellow-400/10' : 'text-zinc-400'}`}
+              >
+                <Icon name="Newspaper" size={16} className="mr-2" />
+                Новости
+              </Button>
+            </Link>
+          </div>
+        )}
       </div>
       
       <Dialog open={showSearch} onOpenChange={setShowSearch}>
