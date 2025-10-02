@@ -204,12 +204,12 @@ export default function Play() {
                 </div>
 
                 <Button
-                  onClick={() => handleFindGame(mode)}
-                  className="w-full bg-gradient-to-r from-yellow-400 to-yellow-600 text-black hover:from-yellow-500 hover:to-yellow-700"
+                  disabled
+                  className="w-full bg-zinc-700 text-zinc-400 cursor-not-allowed"
                   size="default"
                 >
-                  <Icon name="Play" size={18} className="mr-2" />
-                  Играть
+                  <Icon name="Construction" size={18} className="mr-2" />
+                  В разработке
                 </Button>
               </CardContent>
             </Card>
