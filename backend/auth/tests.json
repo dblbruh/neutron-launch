@@ -8,7 +8,9 @@
         "username": "testuser",
         "email": "test@example.com",
         "password": "password123",
-        "displayName": "Test User"
+        "displayName": "Test User",
+        "region": "Europe",
+        "age": 25
       },
       "expectedStatus": 201,
       "expectedBody": {
@@ -31,7 +33,9 @@
         "action": "register",
         "username": "testuser",
         "email": "test2@example.com",
-        "password": "password123"
+        "password": "password123",
+        "region": "Europe",
+        "age": 25
       },
       "expectedStatus": 409,
       "expectedBody": {
