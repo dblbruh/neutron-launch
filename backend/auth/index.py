@@ -24,7 +24,8 @@ def handler(event, context):
                 'Access-Control-Allow-Headers': 'Content-Type, Authorization',
                 'Access-Control-Max-Age': '86400'
             },
-            'body': ''
+            'body': '',
+            'isBase64Encoded': False
         }
     
     cors_headers = {
@@ -45,25 +46,29 @@ def handler(event, context):
                 return {
                     'statusCode': 400,
                     'headers': cors_headers,
-                    'body': json.dumps({'error': 'Invalid action'})
+                    'body': json.dumps({'error': 'Invalid action'}),
+                    'isBase64Encoded': False
                 }
         except json.JSONDecodeError:
             return {
                 'statusCode': 400,
                 'headers': cors_headers,
-                'body': json.dumps({'error': 'Invalid JSON'})
+                'body': json.dumps({'error': 'Invalid JSON'}),
+                'isBase64Encoded': False
             }
         except Exception as e:
             return {
                 'statusCode': 500,
                 'headers': cors_headers,
-                'body': json.dumps({'error': str(e)})
+                'body': json.dumps({'error': str(e)}),
+                'isBase64Encoded': False
             }
     
     return {
         'statusCode': 405,
         'headers': cors_headers,
-        'body': json.dumps({'error': 'Method not allowed'})
+        'body': json.dumps({'error': 'Method not allowed'}),
+        'isBase64Encoded': False
     }
 
 def validate_email(email: str) -> bool:
@@ -84,6 +89,14 @@ def validate_username(username: str) -> str:
         return "Логин может содержать только латинские буквы, цифры и знак подчеркивания"
     return ""
 
+def error_response(message: str, status: int, headers: Dict[str, str]) -> Dict[str, Any]:
+    return {
+        'statusCode': status,
+        'headers': headers,
+        'body': json.dumps({'error': message}),
+        'isBase64Encoded': False
+    }
+
 def register_user(data: Dict[str, Any], headers: Dict[str, str]) -> Dict[str, Any]:
     username = data.get('username', '').strip()
     email = data.get('email', '').strip().lower()
@@ -93,34 +106,34 @@ def register_user(data: Dict[str, Any], headers: Dict[str, str]) -> Dict[str, An
     age = data.get('age')
     
     if not username:
-        return {'statusCode': 400, 'headers': headers, 'body': json.dumps({'error': 'Логин обязателен'})}
+        return error_response('Логин обязателен', 400, headers)
     
     username_error = validate_username(username)
     if username_error:
-        return {'statusCode': 400, 'headers': headers, 'body': json.dumps({'error': username_error})}
+        return error_response(username_error, 400, headers)
     
     if not email:
-        return {'statusCode': 400, 'headers': headers, 'body': json.dumps({'error': 'Email обязателен'})}
+        return error_response('Email обязателен', 400, headers)
     
     if not validate_email(email):
-        return {'statusCode': 400, 'headers': headers, 'body': json.dumps({'error': 'Некорректный email'})}
+        return error_response('Некорректный email', 400, headers)
     
     if not password:
-        return {'statusCode': 400, 'headers': headers, 'body': json.dumps({'error': 'Пароль обязателен'})}
+        return error_response('Пароль обязателен', 400, headers)
     
     password_error = validate_password(password)
     if password_error:
-        return {'statusCode': 400, 'headers': headers, 'body': json.dumps({'error': password_error})}
+        return error_response(password_error, 400, headers)
     
     if not region:
-        return {'statusCode': 400, 'headers': headers, 'body': json.dumps({'error': 'Регион обязателен'})}
+        return error_response('Регион обязателен', 400, headers)
     
     if not age or not isinstance(age, int) or age < 13 or age > 100:
-        return {'statusCode': 400, 'headers': headers, 'body': json.dumps({'error': 'Укажите корректный возраст (13-100)'})}
+        return error_response('Укажите корректный возраст (13-100)', 400, headers)
     
     database_url = os.environ.get('DATABASE_URL')
     if not database_url:
-        return {'statusCode': 500, 'headers': headers, 'body': json.dumps({'error': 'Database connection error'})}
+        return error_response('Database connection error', 500, headers)
     
     try:
         conn = psycopg2.connect(database_url)
@@ -143,11 +156,7 @@ def register_user(data: Dict[str, Any], headers: Dict[str, str]) -> Dict[str, An
         if existing_user:
             cur.close()
             conn.close()
-            return {
-                'statusCode': 409,
-                'headers': headers,
-                'body': json.dumps({'error': 'Пользователь с таким логином или email уже существует'})
-            }
+            return error_response('Пользователь с таким логином или email уже существует', 409, headers)
         
         password_hash = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
         
@@ -188,30 +197,23 @@ def register_user(data: Dict[str, Any], headers: Dict[str, str]) -> Dict[str, An
             'body': json.dumps({
                 'message': 'Регистрация прошла успешно',
                 'user': user_data
-            })
+            }),
+            'isBase64Encoded': False
         }
         
     except psycopg2.Error as e:
-        return {
-            'statusCode': 500,
-            'headers': headers,
-            'body': json.dumps({'error': f'Database error: {str(e)}'})
-        }
+        return error_response(f'Database error: {str(e)}', 500, headers)
 
 def login_user(data: Dict[str, Any], headers: Dict[str, str]) -> Dict[str, Any]:
     login = data.get('login', '').strip()
     password = data.get('password', '')
     
     if not login or not password:
-        return {
-            'statusCode': 400,
-            'headers': headers,
-            'body': json.dumps({'error': 'Логин и пароль обязательны'})
-        }
+        return error_response('Логин и пароль обязательны', 400, headers)
     
     database_url = os.environ.get('DATABASE_URL')
     if not database_url:
-        return {'statusCode': 500, 'headers': headers, 'body': json.dumps({'error': 'Database connection error'})}
+        return error_response('Database connection error', 500, headers)
     
     try:
         conn = psycopg2.connect(database_url)
@@ -231,18 +233,10 @@ def login_user(data: Dict[str, Any], headers: Dict[str, str]) -> Dict[str, Any]:
         conn.close()
         
         if not user:
-            return {
-                'statusCode': 401,
-                'headers': headers,
-                'body': json.dumps({'error': 'Неверный логин или пароль'})
-            }
+            return error_response('Неверный логин или пароль', 401, headers)
         
         if not bcrypt.checkpw(password.encode('utf-8'), user[3].encode('utf-8')):
-            return {
-                'statusCode': 401,
-                'headers': headers,
-                'body': json.dumps({'error': 'Неверный логин или пароль'})
-            }
+            return error_response('Неверный логин или пароль', 401, headers)
         
         user_data = {
             'id': user[0],
@@ -266,12 +260,9 @@ def login_user(data: Dict[str, Any], headers: Dict[str, str]) -> Dict[str, Any]:
             'body': json.dumps({
                 'message': 'Вход выполнен успешно',
                 'user': user_data
-            })
+            }),
+            'isBase64Encoded': False
         }
         
     except psycopg2.Error as e:
-        return {
-            'statusCode': 500,
-            'headers': headers,
-            'body': json.dumps({'error': f'Database error: {str(e)}'})
-        }
+        return error_response(f'Database error: {str(e)}', 500, headers)
