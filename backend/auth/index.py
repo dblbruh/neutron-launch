@@ -124,6 +124,7 @@ def register_user(data: Dict[str, Any], headers: Dict[str, str]) -> Dict[str, An
     
     try:
         conn = psycopg2.connect(database_url)
+        conn.autocommit = True
         cur = conn.cursor()
         
         cur.execute("""
@@ -133,9 +134,10 @@ def register_user(data: Dict[str, Any], headers: Dict[str, str]) -> Dict[str, An
             ADD COLUMN IF NOT EXISTS show_age BOOLEAN DEFAULT true,
             ADD COLUMN IF NOT EXISTS avatar_url TEXT
         """)
-        conn.commit()
         
-        cur.execute("SELECT id FROM users WHERE username = %s OR email = %s", (username, email))
+        username_esc = username.replace("'", "''")
+        email_esc = email.replace("'", "''")
+        cur.execute(f"SELECT id FROM users WHERE username = '{username_esc}' OR email = '{email_esc}'")
         existing_user = cur.fetchone()
         
         if existing_user:
@@ -149,14 +151,19 @@ def register_user(data: Dict[str, Any], headers: Dict[str, str]) -> Dict[str, An
         
         password_hash = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
         
-        cur.execute("""
+        username_esc = username.replace("'", "''")
+        email_esc = email.replace("'", "''")
+        password_hash_esc = password_hash.replace("'", "''")
+        display_name_esc = display_name.replace("'", "''")
+        region_esc = region.replace("'", "''")
+        
+        cur.execute(f"""
             INSERT INTO users (username, email, password_hash, display_name, region, age, show_age, points, level)
-            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
+            VALUES ('{username_esc}', '{email_esc}', '{password_hash_esc}', '{display_name_esc}', '{region_esc}', {age}, true, 100, 1)
             RETURNING id, username, email, display_name, region, age, show_age, points, level, created_at, is_admin
-        """, (username, email, password_hash, display_name, region, age, True, 100, 1))
+        """)
         
         new_user = cur.fetchone()
-        conn.commit()
         
         user_data = {
             'id': new_user[0],
@@ -208,14 +215,16 @@ def login_user(data: Dict[str, Any], headers: Dict[str, str]) -> Dict[str, Any]:
     
     try:
         conn = psycopg2.connect(database_url)
+        conn.autocommit = True
         cur = conn.cursor()
         
-        cur.execute("""
+        login_esc = login.replace("'", "''")
+        cur.execute(f"""
             SELECT id, username, email, password_hash, display_name, region, age, show_age, 
                    avatar_url, points, level, wins, losses, is_admin 
             FROM users 
-            WHERE (username = %s OR email = %s) AND is_active = true
-        """, (login, login))
+            WHERE (username = '{login_esc}' OR email = '{login_esc}') AND is_active = true
+        """)
         
         user = cur.fetchone()
         cur.close()
