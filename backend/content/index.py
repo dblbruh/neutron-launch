@@ -21,7 +21,8 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 'Access-Control-Allow-Headers': 'Content-Type, X-User-Id',
                 'Access-Control-Max-Age': '86400'
             },
-            'body': ''
+            'body': '',
+            'isBase64Encoded': False
         }
     
     cors_headers = {
@@ -37,7 +38,8 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
         return {
             'statusCode': 500,
             'headers': cors_headers,
-            'body': json.dumps({'error': 'Database connection error'})
+            'body': json.dumps({'error': 'Database connection error'}),
+            'isBase64Encoded': False
         }
     
     try:
@@ -59,13 +61,15 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             return {
                 'statusCode': 400,
                 'headers': cors_headers,
-                'body': json.dumps({'error': 'Invalid resource'})
+                'body': json.dumps({'error': 'Invalid resource'}),
+                'isBase64Encoded': False
             }
     except Exception as e:
         return {
             'statusCode': 500,
             'headers': cors_headers,
-            'body': json.dumps({'error': str(e)})
+            'body': json.dumps({'error': str(e)}),
+            'isBase64Encoded': False
         }
 
 def handle_tournaments(event, method, database_url, headers):
@@ -154,7 +158,8 @@ def handle_tournaments(event, method, database_url, headers):
     return {
         'statusCode': 200 if method == 'GET' else 201,
         'headers': headers,
-        'body': json.dumps(result)
+        'body': json.dumps(result),
+        'isBase64Encoded': False
     }
 
 def handle_news(event, method, database_url, headers):
@@ -233,7 +238,8 @@ def handle_news(event, method, database_url, headers):
     return {
         'statusCode': 200 if method == 'GET' else 201,
         'headers': headers,
-        'body': json.dumps(result)
+        'body': json.dumps(result),
+        'isBase64Encoded': False
     }
 
 def handle_friends(event, method, database_url, headers):
@@ -261,7 +267,7 @@ def handle_friends(event, method, database_url, headers):
         if not user_id:
             cur.close()
             conn.close()
-            return {'statusCode': 400, 'headers': headers, 'body': json.dumps({'error': 'user_id required'})}
+            return {'statusCode': 400, 'headers': headers, 'body': json.dumps({'error': 'user_id required'}), 'isBase64Encoded': False}
         
         if get_requests:
             # Получить входящие заявки
@@ -331,7 +337,8 @@ def handle_friends(event, method, database_url, headers):
     return {
         'statusCode': 200 if method == 'GET' else 201,
         'headers': headers,
-        'body': json.dumps(result)
+        'body': json.dumps(result),
+        'isBase64Encoded': False
     }
 
 def handle_challenges(event, method, database_url, headers):
@@ -476,7 +483,8 @@ def handle_challenges(event, method, database_url, headers):
     return {
         'statusCode': 200 if method == 'GET' else 201,
         'headers': headers,
-        'body': json.dumps(result)
+        'body': json.dumps(result),
+        'isBase64Encoded': False
     }
 
 def handle_stats(event, method, database_url, headers):
@@ -548,7 +556,7 @@ def handle_chat(event, method, database_url, headers):
         if not user_id:
             cur.close()
             conn.close()
-            return {'statusCode': 400, 'headers': headers, 'body': json.dumps({'error': 'user_id required'})}
+            return {'statusCode': 400, 'headers': headers, 'body': json.dumps({'error': 'user_id required'}), 'isBase64Encoded': False}
         
         if friend_id:
             cur.execute("""
@@ -587,7 +595,7 @@ def handle_chat(event, method, database_url, headers):
     
     cur.close()
     conn.close()
-    return {'statusCode': 200 if method == 'GET' else 201, 'headers': headers, 'body': json.dumps(result)}
+    return {'statusCode': 200 if method == 'GET' else 201, 'headers': headers, 'body': json.dumps(result), 'isBase64Encoded': False}
 
 def handle_user(event, method, database_url, headers):
     conn = psycopg2.connect(database_url)
@@ -608,7 +616,7 @@ def handle_user(event, method, database_url, headers):
             if not user:
                 cur.close()
                 conn.close()
-                return {'statusCode': 404, 'headers': headers, 'body': json.dumps({'error': 'User not found'})}
+                return {'statusCode': 404, 'headers': headers, 'body': json.dumps({'error': 'User not found'}), 'isBase64Encoded': False}
             
             total = user[5] + user[6]
             result = {
@@ -628,10 +636,10 @@ def handle_user(event, method, database_url, headers):
         else:
             cur.close()
             conn.close()
-            return {'statusCode': 400, 'headers': headers, 'body': json.dumps({'error': 'username or search required'})}
+            return {'statusCode': 400, 'headers': headers, 'body': json.dumps({'error': 'username or search required'}), 'isBase64Encoded': False}
     else:
         result = {'error': 'Method not allowed'}
     
     cur.close()
     conn.close()
-    return {'statusCode': 200, 'headers': headers, 'body': json.dumps(result)}
+    return {'statusCode': 200, 'headers': headers, 'body': json.dumps(result), 'isBase64Encoded': False}
