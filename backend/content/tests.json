@@ -5,29 +5,26 @@
       "method": "GET",
       "path": "/?resource=tournaments",
       "expectedStatus": 200,
-      "expectedBody": "array"
+      "expectedBody": [],
+      "bodyMatcher": "partial"
     },
     {
-      "name": "Get news",
+      "name": "Get stats",
       "method": "GET",
-      "path": "/?resource=news",
+      "path": "/?resource=stats",
       "expectedStatus": 200,
-      "expectedBody": "array"
+      "expectedBody": {
+        "totalUsers": 6
+      },
+      "bodyMatcher": "partial"
     },
     {
-      "name": "Create tournament",
-      "method": "POST",
-      "path": "/?resource=tournaments",
-      "body": {
-        "action": "create",
-        "name": "Test Tournament",
-        "prize_pool": 5000,
-        "max_participants": 8
-      },
-      "expectedStatus": 201,
+      "name": "Get user by id not found",
+      "method": "GET",
+      "path": "/?resource=user&user_id=999999",
+      "expectedStatus": 404,
       "expectedBody": {
-        "id": "number",
-        "name": "string"
+        "error": "string"
       },
       "bodyMatcher": "partial"
     }

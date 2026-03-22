@@ -57,8 +57,7 @@ export default function Profile() {
     }
 
     const loadProfile = async () => {
-      const profileUrl = funcUrls.profile as string;
-      const response = await fetch(`${profileUrl}?user_id=${user.id}`);
+      const response = await fetch(`${funcUrls.content}?resource=user&user_id=${user.id}`);
       
       if (!response.ok) {
         setError('Не удалось загрузить профиль');

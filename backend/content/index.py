@@ -605,11 +605,33 @@ def handle_user(event, method, database_url, headers):
     if method == 'GET':
         params = event.get('queryStringParameters') or {}
         username = params.get('username')
+        user_id = params.get('user_id')
         search = params.get('search')
         
-        if username:
+        if user_id:
             cur.execute("""
-                SELECT id, username, display_name, points, level, wins, losses, created_at
+                SELECT id, username, display_name, points, level, wins, losses, created_at, avatar_url
+                FROM users WHERE id = %s AND is_active = true
+            """, (user_id,))
+            
+            user = cur.fetchone()
+            if not user:
+                cur.close()
+                conn.close()
+                return {'statusCode': 404, 'headers': headers, 'body': json.dumps({'error': 'User not found'}), 'isBase64Encoded': False}
+            
+            total = user[5] + user[6]
+            result = {
+                'id': user[0], 'username': user[1], 'displayName': user[2],
+                'points': user[3], 'level': user[4], 'wins': user[5], 'losses': user[6],
+                'winRate': round((user[5] / total * 100) if total > 0 else 0, 1),
+                'kdRatio': round(user[5] / user[6] if user[6] > 0 else float(user[5]), 2),
+                'totalMatches': total, 'memberSince': user[7].isoformat() if user[7] else None,
+                'avatarUrl': user[8]
+            }
+        elif username:
+            cur.execute("""
+                SELECT id, username, display_name, points, level, wins, losses, created_at, avatar_url
                 FROM users WHERE username = %s AND is_active = true
             """, (username,))
             
@@ -624,7 +646,9 @@ def handle_user(event, method, database_url, headers):
                 'id': user[0], 'username': user[1], 'displayName': user[2],
                 'points': user[3], 'level': user[4], 'wins': user[5], 'losses': user[6],
                 'winRate': round((user[5] / total * 100) if total > 0 else 0, 1),
-                'totalMatches': total, 'memberSince': user[7].isoformat() if user[7] else None
+                'kdRatio': round(user[5] / user[6] if user[6] > 0 else float(user[5]), 2),
+                'totalMatches': total, 'memberSince': user[7].isoformat() if user[7] else None,
+                'avatarUrl': user[8]
             }
         elif search:
             cur.execute("""
