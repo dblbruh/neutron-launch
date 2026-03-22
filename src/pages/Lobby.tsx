@@ -66,10 +66,10 @@ export default function Lobby() {
     if (!user) return;
     
     try {
-      const response = await fetch(`${funcUrls.profile}?user_id=${user.id}&resource=friends`);
+      const response = await fetch(`${funcUrls.content}?resource=friends&user_id=${user.id}`);
       if (response.ok) {
         const data = await response.json();
-        const acceptedFriends = data.filter((f: any) => f.status === 'accepted');
+        const acceptedFriends = data.filter((f: Friend) => f.status === 'accepted');
         setFriends(acceptedFriends);
       }
     } catch (error) {

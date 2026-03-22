@@ -58,6 +58,10 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             return handle_user(event, method, database_url, cors_headers)
         elif resource == 'stats':
             return handle_stats(event, method, database_url, cors_headers)
+        elif resource == 'leaderboard':
+            return handle_leaderboard(event, method, database_url, cors_headers)
+        elif resource == 'users':
+            return handle_users(event, method, database_url, cors_headers)
         else:
             return {
                 'statusCode': 400,
@@ -662,6 +666,122 @@ def handle_user(event, method, database_url, headers):
             cur.close()
             conn.close()
             return {'statusCode': 400, 'headers': headers, 'body': json.dumps({'error': 'username or search required'}), 'isBase64Encoded': False}
+    elif method == 'POST':
+        body = json.loads(event.get('body', '{}'))
+        action = body.get('action')
+        
+        if action == 'update_settings':
+            user_id = body.get('user_id')
+            display_name = body.get('display_name')
+            avatar_url = body.get('avatar_url')
+            
+            conn = psycopg2.connect(database_url)
+            cur = conn.cursor()
+            cur.execute("""
+                UPDATE users SET display_name = %s, avatar_url = %s, updated_at = NOW()
+                WHERE id = %s RETURNING id, username, display_name, avatar_url
+            """, (display_name, avatar_url, user_id))
+            updated = cur.fetchone()
+            conn.commit()
+            cur.close()
+            conn.close()
+            
+            if not updated:
+                return {'statusCode': 404, 'headers': headers, 'body': json.dumps({'error': 'User not found'}), 'isBase64Encoded': False}
+            
+            return {'statusCode': 200, 'headers': headers, 'body': json.dumps({
+                'id': updated[0], 'username': updated[1], 'displayName': updated[2], 'avatarUrl': updated[3]
+            }), 'isBase64Encoded': False}
+        else:
+            return {'statusCode': 400, 'headers': headers, 'body': json.dumps({'error': 'Unknown action'}), 'isBase64Encoded': False}
+    else:
+        result = {'error': 'Method not allowed'}
+    
+    cur.close()
+    conn.close()
+    return {'statusCode': 200, 'headers': headers, 'body': json.dumps(result), 'isBase64Encoded': False}
+
+
+def handle_leaderboard(event, method, database_url, headers):
+    if method != 'GET':
+        return {'statusCode': 405, 'headers': headers, 'body': json.dumps({'error': 'Method not allowed'}), 'isBase64Encoded': False}
+    
+    conn = psycopg2.connect(database_url)
+    cur = conn.cursor()
+    
+    cur.execute("""
+        SELECT id, username, display_name, points, level, wins, losses, avatar_url
+        FROM users WHERE is_active = true
+        ORDER BY points DESC LIMIT 50
+    """)
+    users = cur.fetchall()
+    
+    players = []
+    for u in users:
+        total = u[5] + u[6]
+        players.append({
+            'id': u[0], 'username': u[1], 'displayName': u[2],
+            'points': u[3], 'level': u[4], 'wins': u[5], 'losses': u[6],
+            'avatarUrl': u[7],
+            'winRate': round((u[5] / total * 100) if total > 0 else 0, 1)
+        })
+    
+    cur.execute("""
+        SELECT m.id, u1.username, u2.username, u1.username, m.status, m.created_at
+        FROM matches m
+        LEFT JOIN users u1 ON m.player1_id = u1.id
+        LEFT JOIN users u2 ON m.player2_id = u2.id
+        ORDER BY m.created_at DESC LIMIT 20
+    """)
+    matches_raw = cur.fetchall()
+    recent_matches = [{
+        'id': str(m[0]), 'player1': m[1] or '', 'player2': m[2] or '',
+        'winner': m[3] or '', 'status': m[4] or 'completed',
+        'date': m[5].isoformat() if m[5] else ''
+    } for m in matches_raw]
+    
+    cur.close()
+    conn.close()
+    
+    return {'statusCode': 200, 'headers': headers, 'body': json.dumps({
+        'players': players, 'recentMatches': recent_matches
+    }), 'isBase64Encoded': False}
+
+
+def handle_users(event, method, database_url, headers):
+    conn = psycopg2.connect(database_url)
+    cur = conn.cursor()
+    
+    if method == 'GET':
+        cur.execute("""
+            SELECT id, username, display_name, email, points, level, is_active, is_admin, created_at
+            FROM users ORDER BY created_at DESC LIMIT 100
+        """)
+        users = cur.fetchall()
+        result = [{
+            'id': u[0], 'username': u[1], 'displayName': u[2], 'email': u[3],
+            'points': u[4], 'level': u[5], 'is_active': u[6], 'is_admin': u[7],
+            'created_at': u[8].isoformat() if u[8] else None
+        } for u in users]
+        
+    elif method == 'POST':
+        body = json.loads(event.get('body', '{}'))
+        action = body.get('action')
+        
+        if action == 'toggle_admin':
+            user_id = body.get('user_id')
+            is_admin = body.get('is_admin', False)
+            cur.execute("UPDATE users SET is_admin = %s WHERE id = %s RETURNING id", (is_admin, user_id))
+            conn.commit()
+            result = {'message': 'Updated'}
+        elif action == 'toggle_active':
+            user_id = body.get('user_id')
+            is_active = body.get('is_active', True)
+            cur.execute("UPDATE users SET is_active = %s WHERE id = %s RETURNING id", (is_active, user_id))
+            conn.commit()
+            result = {'message': 'Updated'}
+        else:
+            result = {'error': 'Unknown action'}
     else:
         result = {'error': 'Method not allowed'}
     

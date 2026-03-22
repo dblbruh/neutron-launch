@@ -35,8 +35,7 @@ export default function Leaderboard() {
 
   useEffect(() => {
     const loadData = async () => {
-      const leaderboardUrl = funcUrls.leaderboard as string;
-      const response = await fetch(leaderboardUrl);
+      const response = await fetch(`${funcUrls.content}?resource=leaderboard`);
       
       if (!response.ok) {
         setLoading(false);

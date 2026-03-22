@@ -39,7 +39,7 @@ export default function ProfileSettings() {
     setIsLoading(true);
 
     try {
-      const response = await fetch(`${funcUrls.profile}`, {
+      const response = await fetch(`${funcUrls.content}?resource=user`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
